@@ -26,6 +26,7 @@ import bayern.mimo.masterarbeit.util.Config;
 public class OnButtonSendDataToServerClickListener implements View.OnClickListener {
 
     private StartRideActivity caller;
+    private SendToServerTask task;
 
     public OnButtonSendDataToServerClickListener(StartRideActivity caller) {
         this.caller = caller;
@@ -50,7 +51,7 @@ public class OnButtonSendDataToServerClickListener implements View.OnClickListen
         JSONObject jsonRequest = createRequest();
         String url = Config.SERVER_API_URL + Config.DATA_RECORDING_REQUEST_PATH;
 
-        SendToServerTask task = new SendToServerTask(this);
+        this.task = new SendToServerTask(this);
         task.execute(url, jsonRequest.toString());
 
 
@@ -81,7 +82,7 @@ public class OnButtonSendDataToServerClickListener implements View.OnClickListen
     }
 
 
-    public void requestSucceeded(DataRecordingRequest drr) {
+    /*public void requestSucceeded(DataRecordingRequest drr) {
 
 
         System.out.println("in requestSucceeded(drr)");
@@ -95,7 +96,7 @@ public class OnButtonSendDataToServerClickListener implements View.OnClickListen
             ShimmerHandler handler = shimmerSensors.get(shimmer);
             List<ShimmerValue> values = handler.getValues();
 
-            //TOOD JSON bauen
+            //TODO JSON bauen
             for (ShimmerValue value : values) {
                 if (value.getTimestamp() == null) continue;
                 JSONObject jsonValue = new JSONObject();
@@ -120,7 +121,7 @@ public class OnButtonSendDataToServerClickListener implements View.OnClickListen
 
                     jsonValues.put(jsonValue);
 
-                    System.out.println(jsonValues.toString(2));
+                    //System.out.println(jsonValues.toString(2));
 
                 } catch(JSONException e){
                     e.printStackTrace();
@@ -130,7 +131,7 @@ public class OnButtonSendDataToServerClickListener implements View.OnClickListen
 
             }
         }
-    }
+    }*/
 
 
 }

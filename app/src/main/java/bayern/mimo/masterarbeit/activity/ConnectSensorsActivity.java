@@ -24,7 +24,7 @@ import bayern.mimo.masterarbeit.handler.ShimmerHandler;
 import bayern.mimo.masterarbeit.wrapper.BluetoothDeviceWrapper;
 
 /**
- * Created by MiMo on 11.03.2017.
+ * Created by MiMo
  */
 
 public class ConnectSensorsActivity extends AppCompatActivity {

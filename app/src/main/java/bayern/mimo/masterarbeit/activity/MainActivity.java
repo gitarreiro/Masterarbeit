@@ -16,6 +16,7 @@ import java.util.Date;
 import bayern.mimo.masterarbeit.R;
 import bayern.mimo.masterarbeit.listener.OnButtonConnectSensorsClickListener;
 import bayern.mimo.masterarbeit.listener.OnButtonSettingsClickListener;
+import bayern.mimo.masterarbeit.listener.OnButtonShowUploadDataClickListener;
 import bayern.mimo.masterarbeit.listener.OnButtonStartRideClickListener;
 import bayern.mimo.masterarbeit.util.Util;
 
@@ -131,9 +132,6 @@ public class MainActivity extends AppCompatActivity {
             //Util.showInfoDialog("Info", "You have to grant all permissions in order to be able to use this app!", this);
 
         }
-
-
-
     }
 
     private void initView() {
@@ -142,6 +140,9 @@ public class MainActivity extends AppCompatActivity {
 
         Button buttonStartDrive = (Button) findViewById(R.id.buttonStartDrive);
         buttonStartDrive.setOnClickListener(new OnButtonStartRideClickListener(this));
+
+        Button buttonShowUploadData = (Button) findViewById(R.id.buttonShowAndUploadData);
+        buttonShowUploadData.setOnClickListener(new OnButtonShowUploadDataClickListener(this));
 
         Button buttonSettings = (Button) findViewById(R.id.buttonRecordingSettings);
         buttonSettings.setOnClickListener(new OnButtonSettingsClickListener(this));

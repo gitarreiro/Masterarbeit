@@ -28,7 +28,8 @@ public class DeviceListAdapter extends ArrayAdapter<BluetoothDeviceWrapper> {
     private BluetoothAdapter bTAdapter;
 
     public DeviceListAdapter(Context context, List items, BluetoothAdapter bTAdapter) {
-        super(context, android.R.layout.simple_list_item_1, items);
+        super(context, android.R.layout.simple_list_item_1, items);  //TODO gleich richtiges Layout inflaten?!
+
         this.bTAdapter = bTAdapter;
         this.context = context;
     }
@@ -37,7 +38,8 @@ public class DeviceListAdapter extends ArrayAdapter<BluetoothDeviceWrapper> {
      * Holder for the list items.
      */
     private class ViewHolder{
-        TextView titleText;
+        private TextView titleText;
+        //TODO sauber aufbauen
     }
 
     /**
@@ -57,10 +59,7 @@ public class DeviceListAdapter extends ArrayAdapter<BluetoothDeviceWrapper> {
         TextView macAddress = null;
         View viewToUse = null;
 
-        // This block exists to inflate the settings list device conditionally based on whether
-        // we want to support a grid or list view.
-        LayoutInflater mInflater = (LayoutInflater) context
-                .getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
 
         viewToUse = mInflater.inflate(R.layout.device_list_item, null); //TODO check
         holder = new DeviceListAdapter.ViewHolder();
@@ -68,7 +67,7 @@ public class DeviceListAdapter extends ArrayAdapter<BluetoothDeviceWrapper> {
         viewToUse.setTag(holder);
 
         macAddress = (TextView)viewToUse.findViewById(R.id.macAddress);
-        line = (View)viewToUse.findViewById(R.id.line);
+        line = viewToUse.findViewById(R.id.line);
         holder.titleText.setText(device.getName());
         macAddress.setText(device.getAddress());
 
