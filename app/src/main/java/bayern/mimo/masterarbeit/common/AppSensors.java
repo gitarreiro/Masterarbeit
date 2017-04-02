@@ -3,11 +3,13 @@ package bayern.mimo.masterarbeit.common;
 import com.shimmerresearch.android.Shimmer;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import bayern.mimo.masterarbeit.data.DataHelper;
+import bayern.mimo.masterarbeit.data.DataRecording;
 import bayern.mimo.masterarbeit.data.ShimmerValue;
 import bayern.mimo.masterarbeit.handler.ShimmerHandler;
 
@@ -19,6 +21,8 @@ public class AppSensors {
 
     private static boolean isInitialized;
     private static Map<Shimmer, ShimmerHandler> shimmerSensors;
+    private static DataRecording record;
+    private static Date startTime;
 
     private AppSensors() {
     }
@@ -44,21 +48,36 @@ public class AppSensors {
         for (Shimmer shimmer : shimmerSensors.keySet()) {
             shimmer.startStreaming();
         }
+
+        startTime = new Date();
+
         return true;
     }
 
     public static void stopRecording() {
-        if (!isInitialized) return;
+        if (!isInitialized) return; //TODO sollte eigentlich ned passieren; prüfen
         for (Shimmer shimmer : shimmerSensors.keySet()) {
             shimmer.stopStreaming();
         }
+
+        Map<Shimmer, List<ShimmerValue>> records = new HashMap<>();
+        for(Shimmer key : shimmerSensors.keySet())
+            records.put(key, shimmerSensors.get(key).getValues());
+        record = new DataRecording(records, startTime, new Date());
+
+        DataHelper.init();
+        DataHelper.addRecord(record, true);
     }
 
     public static Map<Shimmer, ShimmerHandler> getShimmerValues() {
         return shimmerSensors;
     }
 
-    public static List<Shimmer> getShimmerSensors(){
+    public static List<Shimmer> getShimmerSensors() {
         return new ArrayList<>(shimmerSensors.keySet());
+    }
+
+    public static DataRecording getLastRecord(){
+        return record;
     }
 }

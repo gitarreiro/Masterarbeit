@@ -6,9 +6,8 @@ import android.widget.Button;
 import android.widget.ToggleButton;
 
 import bayern.mimo.masterarbeit.R;
-import bayern.mimo.masterarbeit.data.DataRecordingRequest;
 import bayern.mimo.masterarbeit.listener.OnButtonSendDataToServerClickListener;
-import bayern.mimo.masterarbeit.listener.OnButtonStartRecordingClickListener;
+import bayern.mimo.masterarbeit.listener.OnButtonStartStopRecordingClickListener;
 
 /**
  * Created by MiMo
@@ -27,8 +26,11 @@ public class StartRideActivity extends AppCompatActivity {
 
     private void init() {
         ToggleButton buttonStartRecording = (ToggleButton) findViewById(R.id.buttonStartRecording);
-        buttonStartRecording.setOnClickListener(new OnButtonStartRecordingClickListener(this));
+        buttonStartRecording.setOnClickListener(new OnButtonStartStopRecordingClickListener(this));
 
+
+
+        //TODO replace (wandert in eigene Activity)
         Button buttonSendDataToServer = (Button) findViewById(R.id.buttonSendDataToServer);
         buttonSendDataToServer.setOnClickListener(new OnButtonSendDataToServerClickListener(this));
     }

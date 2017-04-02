@@ -18,6 +18,8 @@ public class DataRecording {
 
     public DataRecording(Map<Shimmer, List<ShimmerValue>> shimmerValues, Date startDate, Date endDate){
         this.shimmerValues = shimmerValues;
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
 
 
@@ -30,9 +32,8 @@ public class DataRecording {
 
     public int getSensorCount(){
 
+        return shimmerValues.size();
 
-
-        return 0;
     }
 
 }

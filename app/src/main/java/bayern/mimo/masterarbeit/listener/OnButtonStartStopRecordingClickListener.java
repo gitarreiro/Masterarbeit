@@ -1,33 +1,38 @@
 package bayern.mimo.masterarbeit.listener;
 
 import android.view.View;
-import android.widget.Button;
 import android.widget.ToggleButton;
-
-import java.util.List;
 
 import bayern.mimo.masterarbeit.R;
 import bayern.mimo.masterarbeit.activity.StartRideActivity;
 import bayern.mimo.masterarbeit.common.AppSensors;
-import bayern.mimo.masterarbeit.data.ShimmerValue;
 
 /**
  * Created by MiMo
  */
-public class OnButtonStartRecordingClickListener implements View.OnClickListener {
+public class OnButtonStartStopRecordingClickListener implements View.OnClickListener {
 
     private StartRideActivity caller;
     private boolean isRecording = false;
 
-    public OnButtonStartRecordingClickListener(StartRideActivity caller) {
+    public OnButtonStartStopRecordingClickListener(StartRideActivity caller) {
         this.caller = caller;
     }
 
     @Override
     public void onClick(View v) {
-        if(isRecording){
+        if (isRecording) {
             AppSensors.stopRecording();
-            isRecording = !isRecording;
+            isRecording = false;
+
+
+
+
+
+
+
+
+
 
             /*
             List<List<ShimmerValue>> valuesList = AppSensors.getShimmerValues();
@@ -39,12 +44,15 @@ public class OnButtonStartRecordingClickListener implements View.OnClickListener
 */
 
 
-
-        } else{
-            if(!AppSensors.startRecording())
+        } else {
+            if (!AppSensors.startRecording()) {
                 ((ToggleButton) caller.findViewById(R.id.buttonStartRecording)).setChecked(false);
-            else
-                isRecording = !isRecording;
+                //TODO Meldung anzeigen
+                //
+            } else {
+                isRecording = true;
+
+            }
         }
     }
 }

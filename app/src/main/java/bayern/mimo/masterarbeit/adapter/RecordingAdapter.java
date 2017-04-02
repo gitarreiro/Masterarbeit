@@ -51,8 +51,24 @@ public class RecordingAdapter extends ArrayAdapter<DataRecording> {
     }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
     private class ViewHolder{
         private TextView textViewDate;
         private TextView textViewSensors;
     }
+
+
+
 }
