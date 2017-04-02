@@ -27,6 +27,7 @@ public class StartRideActivity extends AppCompatActivity {
             System.out.println("STACKTRACE : "+exception);
         }
 
+
         init();
     }
 
