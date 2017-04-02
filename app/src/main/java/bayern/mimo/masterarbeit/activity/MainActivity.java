@@ -21,7 +21,7 @@ import bayern.mimo.masterarbeit.listener.OnButtonStartRideClickListener;
 import bayern.mimo.masterarbeit.util.Util;
 
 public class MainActivity extends AppCompatActivity {
-
+//TODO long time todo: Auto-Connect?
     /*
     private final BroadcastReceiver bluetoothBroadcastReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {

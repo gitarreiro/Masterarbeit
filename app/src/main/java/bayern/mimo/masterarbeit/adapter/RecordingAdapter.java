@@ -44,7 +44,7 @@ public class RecordingAdapter extends ArrayAdapter<DataRecording> {
         holder.textViewSensors = (TextView) viewToUse.findViewById(R.id.texstViewNumberSensors);
         viewToUse.setTag(holder);
 
-        holder.textViewDate.setText(record.getStartDate());
+        holder.textViewDate.setText(record.getInfo());
         holder.textViewSensors.setText("Used sensors: " + record.getSensorCount());
 
         return viewToUse;

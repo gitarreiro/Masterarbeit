@@ -49,10 +49,9 @@ public class AppSensors {
         shimmerSensors.remove(sensor);
     }
 
-    public static boolean startRecording(String info) {
+    public static boolean startRecording() {
         if (!isInitialized) return false; //TODO Fehlermeldung ausgeben
 
-        AppSensors.info = info;
         for (Shimmer shimmer : shimmerSensors.keySet()) {
             shimmer.startStreaming();
         }
@@ -68,13 +67,8 @@ public class AppSensors {
             shimmer.stopStreaming();
         }
 
-        Map<Shimmer, List<ShimmerValue>> records = new HashMap<>();
-        for(Shimmer key : shimmerSensors.keySet())
-            records.put(key, shimmerSensors.get(key).getValues());
-        record = new DataRecording(info, records, startTime, new Date());
-
-        DataHelper.init();
-        DataHelper.addRecord(record, true);
+        //DataHelper.init();
+        //DataHelper.addRecord(record, true);
     }
 
 
@@ -89,5 +83,21 @@ public class AppSensors {
 
     public static DataRecording getLastRecord(){
         return record;
+    }
+
+    public static void setInfo(String info){
+        AppSensors.info = info;
+    }
+
+    public static void commit(){
+        System.out.println("AppSensors.commit()");
+        Map<Shimmer, List<ShimmerValue>> recordings = new HashMap<>();
+        for(Shimmer key : shimmerSensors.keySet())
+            recordings.put(key, shimmerSensors.get(key).getValues());
+
+        record = new DataRecording(info, recordings, startTime, new Date());
+
+        DataHelper.init();
+        DataHelper.addRecord(record, true);
     }
 }

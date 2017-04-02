@@ -55,7 +55,6 @@ public class ShowAndUploadDataActivity extends AppCompatActivity {
 
         registerForContextMenu(listViewData);
 
-        System.out.println("ShowAndUploadDataActivity.onCreate(); Records: " + DataHelper.getDataRecordings().size());
 
     }
 
@@ -98,11 +97,6 @@ public class ShowAndUploadDataActivity extends AppCompatActivity {
 
 
                 //TODO Gesamt-JSON pro Sensor schicken
-
-                //JSONObject json = new JSONObject();
-
-
-
 
 
 

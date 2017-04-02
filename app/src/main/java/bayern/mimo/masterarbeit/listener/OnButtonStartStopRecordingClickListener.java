@@ -15,6 +15,8 @@ public class OnButtonStartStopRecordingClickListener implements View.OnClickList
 
     private StartRideActivity caller;
     private boolean isRecording = false;
+    private MADialog dialog;
+
 
     public OnButtonStartStopRecordingClickListener(StartRideActivity caller) {
         this.caller = caller;
@@ -26,39 +28,44 @@ public class OnButtonStartStopRecordingClickListener implements View.OnClickList
             AppSensors.stopRecording();
             isRecording = false;
 
+            View.OnClickListener positive = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (v == null) {
+                        System.out.println("v is null");
+                        return;
+                    }
+
+
+                    System.out.println("Tag: " + v.getTag());
+                    AppSensors.setInfo(v.getTag().toString());
+                    AppSensors.commit();
+
+                    if (dialog != null) dialog.dismiss();
+                }
+            };
+
+            this.dialog = new MADialog(caller, positive, null);
+            this.dialog.show();
+
+
+
         } else {
 
 
             if (!AppSensors.isReadyForRecording()) {
-                ((ToggleButton) caller.findViewById(R.id.buttonStartRecording)).setChecked(false);
+                 ((ToggleButton) caller.findViewById(R.id.buttonStartRecording)).setChecked(false);
                 //TODO Meldung anzeigen
                 //
             } else {
 
+                AppSensors.startRecording();
 
-                View.OnClickListener positive = new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if(v == null){
-                            System.out.println("v is null");
-                            return;
-                        }
-
-                        //System.out.println("Tag: " + v.getTag());
-                        //startRecording(v.getTag().toString());
-                    }
-                };
-
-                new MADialog(caller, positive, null).show();
+                isRecording = true;
 
 
             }
         }
     }
 
-    private void startRecording(String info) {
-        AppSensors.startRecording(info);
-
-        isRecording = true;
-    }
 }

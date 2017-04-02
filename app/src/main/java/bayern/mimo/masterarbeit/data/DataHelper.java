@@ -25,7 +25,11 @@ public class DataHelper {
     }
 
     public static void init() {
+
+        System.out.println("initializing DataHelper...");
         if (isInitialized) return;
+
+        System.out.println("initialization in progress! (did not return)");
 
         records = new ArrayList<>();
         records.addAll(getRecordsFromDB());
@@ -34,20 +38,26 @@ public class DataHelper {
 
     public static List<DataRecording> getDataRecordings() {
 
+        init();
+        System.out.println("recordings vor DEBUG: " + records.size());
+
         if(DEBUG){
             DataRecording record = new DataRecording("Test", new HashMap<Shimmer, List<ShimmerValue>>(), new Date(), new Date());
             List<DataRecording> tmpRecords = new ArrayList<>();
             tmpRecords.add(record);
-            return tmpRecords;
+            //return tmpRecords;
+            records.addAll(tmpRecords);
         }
 
 
 
-        init();
         return records;
     }
 
     public static boolean addRecord(DataRecording record, boolean shouldAddToDB) {
+
+        System.out.println("adding record with " + record.getSensorCount() +" sensors.");
+
         records.add(record);
         if (shouldAddToDB)
             addRecordToDB(record);

@@ -17,29 +17,31 @@ import bayern.mimo.masterarbeit.R;
  * Created by MiMo on 02.04.2017.
  */
 
-public class MADialog extends Dialog implements AdapterView.OnItemClickListener {
+public class MADialog extends Dialog implements AdapterView.OnItemSelectedListener {
 
+    private List<String> categories;
+    private Button buttonPositive;
+    private Button buttonNegative;
 
     public MADialog(Context context, View.OnClickListener positive, View.OnClickListener negative) {
         super(context);
         setContentView(R.layout.dialog_ma);
 
-        Button buttonPositive = (Button) findViewById(R.id.dialogButtonOK);
-        Button buttonNegative = (Button) findViewById(R.id.dialogButtonCancel);
+        buttonPositive = (Button) findViewById(R.id.dialogButtonOK);
+        buttonNegative = (Button) findViewById(R.id.dialogButtonCancel);
 
         if (positive != null)
             buttonPositive.setOnClickListener(positive);
         else
             buttonPositive.setVisibility(View.GONE);
 
-        buttonPositive.setTag("Test");
 
         if(negative != null)
             buttonNegative.setOnClickListener(negative);
         else
             buttonNegative.setVisibility(View.GONE);
 
-        List<String> categories = new ArrayList<String>();
+        categories = new ArrayList<>();
         categories.add("S0");
         categories.add("S1");
         categories.add("S2");
@@ -47,18 +49,28 @@ public class MADialog extends Dialog implements AdapterView.OnItemClickListener 
         categories.add("S4");
         categories.add("S5");
 
+        //  buttonPositive.setTag(categories.get(0));
         ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, categories);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         Spinner spinner = (Spinner) findViewById(R.id.dialogSpinner);
-        spinner.setOnItemClickListener(this);
+        spinner.setOnItemSelectedListener(this);
 
         spinner.setAdapter(adapter);
     }
 
 
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
+
+        if(buttonPositive != null)
+            buttonPositive.setTag(this.categories.get(position));
+    }
+
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        //TODO mal schaun
     }
 }
