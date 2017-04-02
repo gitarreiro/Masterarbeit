@@ -35,10 +35,8 @@ import bayern.mimo.masterarbeit.listener.OnButtonSendDataToServerClickListener;
 
 public class SendToServerTask extends AsyncTask<String, Void, String> {
 
-    private OnButtonSendDataToServerClickListener caller;
+    public SendToServerTask(){
 
-    public SendToServerTask(OnButtonSendDataToServerClickListener caller){
-        this.caller = caller;
     }
 
     @Override

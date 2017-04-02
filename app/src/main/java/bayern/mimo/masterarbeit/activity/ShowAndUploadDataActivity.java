@@ -11,10 +11,20 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.shimmerresearch.android.Shimmer;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.List;
+
 import bayern.mimo.masterarbeit.R;
+import bayern.mimo.masterarbeit.SendToServerTask;
 import bayern.mimo.masterarbeit.adapter.RecordingAdapter;
+import bayern.mimo.masterarbeit.common.AppSensors;
 import bayern.mimo.masterarbeit.data.DataHelper;
 import bayern.mimo.masterarbeit.data.DataRecording;
+import bayern.mimo.masterarbeit.util.Config;
 
 /**
  * Created by MiMo
@@ -23,6 +33,7 @@ import bayern.mimo.masterarbeit.data.DataRecording;
 public class ShowAndUploadDataActivity extends AppCompatActivity {
 
     private ArrayAdapter<DataRecording> recordingAdapter;
+    private SendToServerTask task;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -74,7 +85,30 @@ public class ShowAndUploadDataActivity extends AppCompatActivity {
         switch (item.getTitle().toString()) {
             case "Upload data":
                 DataRecording record = this.recordingAdapter.getItem(info.position);
-                //TODO do upload if data hasn't been uploaded yet
+                //TODO do upload only if data hasn't been uploaded yet
+
+
+                //TODO request schicken
+
+                JSONObject jsonRequest = createRequest();
+                String url = Config.SERVER_API_URL + Config.DATA_RECORDING_REQUEST_PATH;
+
+                this.task = new SendToServerTask();
+                task.execute(url, jsonRequest.toString());
+
+
+                //TODO Gesamt-JSON pro Sensor schicken
+
+                //JSONObject json = new JSONObject();
+
+
+
+
+
+
+
+
+
                 break;
             default:
                 //TODO DAS sollte nicht passieren
@@ -83,5 +117,24 @@ public class ShowAndUploadDataActivity extends AppCompatActivity {
 
         //TODO maybe replace
         return super.onContextItemSelected(item);
+    }
+
+    private JSONObject createRequest() {
+        List<Shimmer> shimmerSensors = AppSensors.getShimmerSensors();
+
+        JSONObject request = new JSONObject();
+        try {
+            request.put("Username", "testuser");
+            if (shimmerSensors.size() > 0)
+                request.put("Shimmer1MAC", shimmerSensors.get(0).getBluetoothAddress());
+
+            if (shimmerSensors.size() > 1)
+                request.put("Shimmer2MAC", shimmerSensors.get(1).getBluetoothAddress());
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return request;
     }
 }

@@ -15,8 +15,10 @@ public class DataRecording {
     private Map<Shimmer, List<ShimmerValue>> shimmerValues;
     private Date startDate;
     private Date endDate;
+    private String info;
 
-    public DataRecording(Map<Shimmer, List<ShimmerValue>> shimmerValues, Date startDate, Date endDate){
+    public DataRecording(String info, Map<Shimmer, List<ShimmerValue>> shimmerValues, Date startDate, Date endDate){
+        this.info = info;
         this.shimmerValues = shimmerValues;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -36,4 +38,7 @@ public class DataRecording {
 
     }
 
+    public String getInfo() {
+        return info;
+    }
 }

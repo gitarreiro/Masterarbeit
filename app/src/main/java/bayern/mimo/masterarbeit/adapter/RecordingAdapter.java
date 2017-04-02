@@ -30,7 +30,7 @@ public class RecordingAdapter extends ArrayAdapter<DataRecording> {
 
     @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
         View viewToUse = null;
 
@@ -38,7 +38,7 @@ public class RecordingAdapter extends ArrayAdapter<DataRecording> {
 
         LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
 
-        viewToUse = mInflater.inflate(R.layout.recording_list_item, null); //TODO check
+        viewToUse = mInflater.inflate(R.layout.recording_list_item, null); //TODO check (ViewHolder verwenden?)
         ViewHolder holder = new RecordingAdapter.ViewHolder();
         holder.textViewDate = (TextView)viewToUse.findViewById(R.id.dateTextView);
         holder.textViewSensors = (TextView) viewToUse.findViewById(R.id.texstViewNumberSensors);
@@ -49,20 +49,6 @@ public class RecordingAdapter extends ArrayAdapter<DataRecording> {
 
         return viewToUse;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     private class ViewHolder{
         private TextView textViewDate;

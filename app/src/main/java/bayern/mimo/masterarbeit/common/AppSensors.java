@@ -23,6 +23,8 @@ public class AppSensors {
     private static Map<Shimmer, ShimmerHandler> shimmerSensors;
     private static DataRecording record;
     private static Date startTime;
+    private static String info;
+    //TODO add category choice
 
     private AppSensors() {
     }
@@ -38,13 +40,19 @@ public class AppSensors {
         shimmerSensors.put(sensor, handler);
     }
 
+    public static boolean isReadyForRecording(){
+        return isInitialized;
+    }
+
     public static void removeSensor(Shimmer sensor) {
         //TODO check if this works
         shimmerSensors.remove(sensor);
     }
 
-    public static boolean startRecording() {
+    public static boolean startRecording(String info) {
         if (!isInitialized) return false; //TODO Fehlermeldung ausgeben
+
+        AppSensors.info = info;
         for (Shimmer shimmer : shimmerSensors.keySet()) {
             shimmer.startStreaming();
         }
@@ -63,11 +71,13 @@ public class AppSensors {
         Map<Shimmer, List<ShimmerValue>> records = new HashMap<>();
         for(Shimmer key : shimmerSensors.keySet())
             records.put(key, shimmerSensors.get(key).getValues());
-        record = new DataRecording(records, startTime, new Date());
+        record = new DataRecording(info, records, startTime, new Date());
 
         DataHelper.init();
         DataHelper.addRecord(record, true);
     }
+
+
 
     public static Map<Shimmer, ShimmerHandler> getShimmerValues() {
         return shimmerSensors;

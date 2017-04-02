@@ -6,6 +6,7 @@ import android.widget.ToggleButton;
 import bayern.mimo.masterarbeit.R;
 import bayern.mimo.masterarbeit.activity.StartRideActivity;
 import bayern.mimo.masterarbeit.common.AppSensors;
+import bayern.mimo.masterarbeit.view.MADialog;
 
 /**
  * Created by MiMo
@@ -25,34 +26,39 @@ public class OnButtonStartStopRecordingClickListener implements View.OnClickList
             AppSensors.stopRecording();
             isRecording = false;
 
-
-
-
-
-
-
-
-
-
-            /*
-            List<List<ShimmerValue>> valuesList = AppSensors.getShimmerValues();
-            for(List<ShimmerValue> values : valuesList){
-                for(ShimmerValue value : values){
-                    System.out.println("realtime at time " + value.getTimestamp()+" is "+ value.getRealTimeClock());
-                }
-            }
-*/
-
-
         } else {
-            if (!AppSensors.startRecording()) {
+
+
+            if (!AppSensors.isReadyForRecording()) {
                 ((ToggleButton) caller.findViewById(R.id.buttonStartRecording)).setChecked(false);
                 //TODO Meldung anzeigen
                 //
             } else {
-                isRecording = true;
+
+
+                View.OnClickListener positive = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(v == null){
+                            System.out.println("v is null");
+                            return;
+                        }
+
+                        //System.out.println("Tag: " + v.getTag());
+                        //startRecording(v.getTag().toString());
+                    }
+                };
+
+                new MADialog(caller, positive, null).show();
+
 
             }
         }
+    }
+
+    private void startRecording(String info) {
+        AppSensors.startRecording(info);
+
+        isRecording = true;
     }
 }

@@ -46,40 +46,11 @@ public class OnButtonSendDataToServerClickListener implements View.OnClickListen
         Toast.makeText(caller, max + " Sensordatensätze (maximal)", Toast.LENGTH_LONG).show();
 */
 
-        //TODO request schicken
-
-        JSONObject jsonRequest = createRequest();
-        String url = Config.SERVER_API_URL + Config.DATA_RECORDING_REQUEST_PATH;
-
-        this.task = new SendToServerTask(this);
-        task.execute(url, jsonRequest.toString());
-
-
-        //TODO Gesamt-JSON pro Sensor schicken
-
-        //JSONObject json = new JSONObject();
 
 
     }
 
-    private JSONObject createRequest() {
-        List<Shimmer> shimmerSensors = AppSensors.getShimmerSensors();
 
-        JSONObject request = new JSONObject();
-        try {
-            request.put("Username", "testuser");
-            if (shimmerSensors.size() > 0)
-                request.put("Shimmer1MAC", shimmerSensors.get(0).getBluetoothAddress());
-
-            if (shimmerSensors.size() > 1)
-                request.put("Shimmer2MAC", shimmerSensors.get(1).getBluetoothAddress());
-
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return request;
-    }
 
 
     /*public void requestSucceeded(DataRecordingRequest drr) {

@@ -35,7 +35,7 @@ public class DataHelper {
     public static List<DataRecording> getDataRecordings() {
 
         if(DEBUG){
-            DataRecording record = new DataRecording(new HashMap<Shimmer, List<ShimmerValue>>(), new Date(), new Date());
+            DataRecording record = new DataRecording("Test", new HashMap<Shimmer, List<ShimmerValue>>(), new Date(), new Date());
             List<DataRecording> tmpRecords = new ArrayList<>();
             tmpRecords.add(record);
             return tmpRecords;

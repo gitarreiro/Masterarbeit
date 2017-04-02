@@ -6,6 +6,7 @@ import android.widget.Button;
 import android.widget.ToggleButton;
 
 import bayern.mimo.masterarbeit.R;
+import bayern.mimo.masterarbeit.exception.MAExceptionHandler;
 import bayern.mimo.masterarbeit.listener.OnButtonSendDataToServerClickListener;
 import bayern.mimo.masterarbeit.listener.OnButtonStartStopRecordingClickListener;
 
@@ -21,18 +22,28 @@ public class StartRideActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_ride);
 
+        if(getIntent().hasExtra("stacktrace")){
+            String exception = getIntent().getStringExtra("stacktrace");
+            System.out.println("STACKTRACE : "+exception);
+        }
+
         init();
     }
 
     private void init() {
+
+        Thread.setDefaultUncaughtExceptionHandler(new MAExceptionHandler(this,
+                StartRideActivity.class));
+
+
         ToggleButton buttonStartRecording = (ToggleButton) findViewById(R.id.buttonStartRecording);
         buttonStartRecording.setOnClickListener(new OnButtonStartStopRecordingClickListener(this));
 
 
 
         //TODO replace (wandert in eigene Activity)
-        Button buttonSendDataToServer = (Button) findViewById(R.id.buttonSendDataToServer);
-        buttonSendDataToServer.setOnClickListener(new OnButtonSendDataToServerClickListener(this));
+        //Button buttonSendDataToServer = (Button) findViewById(R.id.buttonSendDataToServer);
+        //buttonSendDataToServer.setOnClickListener(new OnButtonSendDataToServerClickListener(this));
     }
 
 
