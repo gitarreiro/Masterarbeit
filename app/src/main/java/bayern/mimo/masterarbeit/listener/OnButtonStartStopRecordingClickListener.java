@@ -38,7 +38,15 @@ public class OnButtonStartStopRecordingClickListener implements View.OnClickList
 
 
                     System.out.println("Tag: " + v.getTag());
-                    AppSensors.setInfo(v.getTag().toString());
+
+                    String[] split = v.getTag().toString().split("|");
+                    String category = split[0];
+                    String detail = "";
+                    if(split.length>1)
+                        detail = split[1];
+
+                    AppSensors.setCategory(category);
+                    AppSensors.setDetail(detail);
                     AppSensors.commit();
 
                     if (dialog != null) dialog.dismiss();

@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 
 import java.util.ArrayList;
@@ -36,18 +37,22 @@ public class MADialog extends Dialog implements AdapterView.OnItemSelectedListen
             buttonPositive.setVisibility(View.GONE);
 
 
-        if(negative != null)
+        if (negative != null)
             buttonNegative.setOnClickListener(negative);
         else
             buttonNegative.setVisibility(View.GONE);
 
         categories = new ArrayList<>();
+        categories.add("Smooth road");
         categories.add("S0");
         categories.add("S1");
         categories.add("S2");
         categories.add("S3");
         categories.add("S4");
         categories.add("S5");
+        categories.add("Backflip");
+        categories.add("Whip");
+        categories.add("Tabletop");
 
         //  buttonPositive.setTag(categories.get(0));
         ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, categories);
@@ -57,15 +62,18 @@ public class MADialog extends Dialog implements AdapterView.OnItemSelectedListen
         spinner.setOnItemSelectedListener(this);
 
         spinner.setAdapter(adapter);
+
     }
 
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
+        EditText editText = (EditText) findViewById(R.id.dialogEditText);
+        String freeText = editText.getText().toString();
 
-        if(buttonPositive != null)
-            buttonPositive.setTag(this.categories.get(position));
+        if (buttonPositive != null)
+            buttonPositive.setTag(this.categories.get(position) + "|" +freeText);
     }
 
 

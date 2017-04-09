@@ -24,10 +24,13 @@ import java.util.Map;
 
 import bayern.mimo.masterarbeit.activity.StartRideActivity;
 import bayern.mimo.masterarbeit.common.AppSensors;
+import bayern.mimo.masterarbeit.data.DataHelper;
+import bayern.mimo.masterarbeit.data.DataRecording;
 import bayern.mimo.masterarbeit.data.DataRecordingRequest;
 import bayern.mimo.masterarbeit.data.ShimmerValue;
 import bayern.mimo.masterarbeit.handler.ShimmerHandler;
 import bayern.mimo.masterarbeit.listener.OnButtonSendDataToServerClickListener;
+import bayern.mimo.masterarbeit.util.Config;
 
 /**
  * Created by MiMo
@@ -35,8 +38,10 @@ import bayern.mimo.masterarbeit.listener.OnButtonSendDataToServerClickListener;
 
 public class SendToServerTask extends AsyncTask<String, Void, String> {
 
-    public SendToServerTask(){
+    private DataRecording record;
 
+    public SendToServerTask(DataRecording record){
+        this.record = record;
     }
 
     @Override
@@ -73,6 +78,8 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
             InputStream in = urlConn.getInputStream();
             InputStreamReader inputStreamReader = new InputStreamReader(in);
 
+            //TODO evtl. umschreiben - und nicht zeichenweise lesen...
+
             int inputStreamData = inputStreamReader.read();
             while (inputStreamData != -1) {
                 char current = (char) inputStreamData;
@@ -94,9 +101,26 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String result) {
         System.out.println("Got result: " + result);
+
+        if(result.startsWith("DRRID")){
+            String[] split = result.split(":");
+            int drrID = -1;
+            try {
+                drrID = Integer.parseInt(split[1]);
+            }catch(NumberFormatException e){
+                e.printStackTrace();
+            }
+
+            if(drrID != -1){
+                DataHelper.setUploadCompleted(drrID);
+            }
+
+            return;
+        }
+
         try{
             JSONObject json = new JSONObject(result);
-            if(json.has("Shimmer1MAC") && json.has("Shimmer2MAC") && json.has("Shimmer1GUID") && json.has("Shimmer2GUID")) { //TODO besseren cae definieren. für jetzt reucht das auf alle fällte
+            if(json.has("Shimmer1MAC") && json.has("Shimmer2MAC") ) { //TODO besseren case definieren. für jetzt reicht das auf alle fälle
                 int id = json.getInt("ID");
 
                 String username = json.getString("Username");
@@ -130,40 +154,51 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
     private void requestSucceeded(DataRecordingRequest drr) {
         System.out.println("in requestSucceeded(drr)");
         //TODO send all the shit
-        Map<Shimmer, ShimmerHandler> shimmerSensors = AppSensors.getShimmerValues();
-        JSONArray jsonValues = new JSONArray();
+
+        String uploadPath = Config.SERVER_API_URL + Config.SHIMMER_UPLOAD_PATH;
+
+        //Map<Shimmer, ShimmerHandler> shimmerSensors = AppSensors.getShimmerValues();
+        JSONArray allValuesJson = new JSONArray();
 
 
-        for (Shimmer shimmer : shimmerSensors.keySet()) {
+        for(Shimmer shimmer : record.getShimmerValues().keySet()){
 
-            ShimmerHandler handler = shimmerSensors.get(shimmer);
-            List<ShimmerValue> values = handler.getValues();
+
+
+
+            //himmerHandler handler = shimmerSensors.get(shimmer);
+            //List<ShimmerValue> values = handler.getValues();
+
+            List<ShimmerValue> values = record.getShimmerValues().get(shimmer);
+            JSONArray sensorAsJson = new JSONArray();
 
             //TODO JSON bauen
             for (ShimmerValue value : values) {
                 if (value.getTimestamp() == null) continue;
-                JSONObject jsonValue = new JSONObject();
+                JSONObject valueAsJson = new JSONObject();
                 try {
-                    jsonValue.put("AccelLnX", value.getAccelLnX());
-                    jsonValue.put("AccelLnY", value.getAccelLnY());
-                    jsonValue.put("AccelLnZ", value.getAccelLnZ());
-                    jsonValue.put("AccelWrX", value.getAccelWrX());
-                    jsonValue.put("AccelWrY", value.getAccelWrY());
-                    jsonValue.put("AccelWrZ", value.getAccelWrZ());
-                    jsonValue.put("GyroX", value.getGyroX());
-                    jsonValue.put("GyroY", value.getGyroY());
-                    jsonValue.put("GyroZ", value.getGyroZ());
-                    jsonValue.put("MagX", value.getMagX());
-                    jsonValue.put("MagY", value.getMagY());
-                    jsonValue.put("MagZ", value.getMagZ());
-                    jsonValue.put("Temperature", value.getTemperature());
-                    jsonValue.put("RealTimeClock", value.getRealTimeClock());
-                    jsonValue.put("TimestampSync", value.getTimestampSync());
-                    jsonValue.put("RealTimeClockSync", value.getRealTimeClockSync());
-                    jsonValue.put("DataRecordingRequestID", drr.getId());
-                    jsonValue.put("SensorMAC", shimmer.getBluetoothAddress());
+                    valueAsJson.put("AccelLnX", value.getAccelLnX());
+                    valueAsJson.put("AccelLnY", value.getAccelLnY());
+                    valueAsJson.put("AccelLnZ", value.getAccelLnZ());
+                    valueAsJson.put("AccelWrX", value.getAccelWrX());
+                    valueAsJson.put("AccelWrY", value.getAccelWrY());
+                    valueAsJson.put("AccelWrZ", value.getAccelWrZ());
+                    valueAsJson.put("GyroX", value.getGyroX());
+                    valueAsJson.put("GyroY", value.getGyroY());
+                    valueAsJson.put("GyroZ", value.getGyroZ());
+                    valueAsJson.put("MagX", value.getMagX());
+                    valueAsJson.put("MagY", value.getMagY());
+                    valueAsJson.put("MagZ", value.getMagZ());
+                    valueAsJson.put("Temperature", value.getTemperature());
+                    valueAsJson.put("Pressure", value.getPressure());
+                    valueAsJson.put("Timestamp", value.getTimestamp());
+                    valueAsJson.put("RealTimeClock", value.getRealTimeClock());
+                    valueAsJson.put("TimestampSync", value.getTimestampSync());
+                    valueAsJson.put("RealTimeClockSync", value.getRealTimeClockSync());
+                    valueAsJson.put("DataRecordingRequestID", drr.getId());
+                    valueAsJson.put("SensorMAC", shimmer.getBluetoothAddress());
 
-                    jsonValues.put(jsonValue);
+                    sensorAsJson.put(valueAsJson);
 
                     //System.out.println(jsonValues.toString(2));
 
@@ -171,7 +206,28 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
                     e.printStackTrace();
                 }
 
+                allValuesJson.put(sensorAsJson);
+
             }
+
+            System.out.println("-_-_-_-_-_-_-UPLOADING-_-_-_-_-_-_-");
+
+            System.out.println("Upload path: " + uploadPath);
+            System.out.println("data: \n");
+
+            try {
+                System.out.println(allValuesJson.toString(2));
+            }catch (JSONException e){
+                e.printStackTrace();
+            }
+
+
+
+            this.execute(uploadPath, allValuesJson.toString());
+
+
+            //System.out.println("-_-_-_-_-_-_-UPLOADING DONE-_-_-_-_-_-_-");
+
             //TODO send
         }
     }

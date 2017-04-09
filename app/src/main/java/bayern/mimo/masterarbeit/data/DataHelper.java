@@ -42,7 +42,7 @@ public class DataHelper {
         System.out.println("recordings vor DEBUG: " + records.size());
 
         if(DEBUG){
-            DataRecording record = new DataRecording("Test", new HashMap<Shimmer, List<ShimmerValue>>(), new Date(), new Date());
+            DataRecording record = new DataRecording("Test", "Desc", new HashMap<Shimmer, List<ShimmerValue>>(), new Date(), new Date());
             List<DataRecording> tmpRecords = new ArrayList<>();
             tmpRecords.add(record);
             //return tmpRecords;
@@ -73,6 +73,18 @@ public class DataHelper {
 
 
         return dbRecords;
+    }
+
+
+    public static void setUploadCompleted(int drrID){
+        for(DataRecording record : records){
+            if(record.getDrrID() == drrID){
+                record.setUploaded(true);
+                break;
+            }
+        }
+
+        //TODO set upload completed in database
     }
 
 }

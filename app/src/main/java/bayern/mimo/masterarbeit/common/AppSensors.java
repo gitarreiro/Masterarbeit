@@ -23,7 +23,8 @@ public class AppSensors {
     private static Map<Shimmer, ShimmerHandler> shimmerSensors;
     private static DataRecording record;
     private static Date startTime;
-    private static String info;
+    private static String category;
+    private static String detail;
     //TODO add category choice
 
     private AppSensors() {
@@ -85,8 +86,12 @@ public class AppSensors {
         return record;
     }
 
-    public static void setInfo(String info){
-        AppSensors.info = info;
+    public static void setCategory(String category){
+        AppSensors.category = category;
+    }
+
+    public static void setDetail(String detail){
+        AppSensors.detail = detail;
     }
 
     public static void commit(){
@@ -95,7 +100,7 @@ public class AppSensors {
         for(Shimmer key : shimmerSensors.keySet())
             recordings.put(key, shimmerSensors.get(key).getValues());
 
-        record = new DataRecording(info, recordings, startTime, new Date());
+        record = new DataRecording(category, detail, recordings, startTime, new Date());
 
         DataHelper.init();
         DataHelper.addRecord(record, true);
