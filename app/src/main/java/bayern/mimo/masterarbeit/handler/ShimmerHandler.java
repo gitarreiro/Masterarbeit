@@ -68,7 +68,7 @@ public class ShimmerHandler extends Handler {
                                                             magX, magY, magZ,
                                                             temperature, pressure,
                                                             timestamp, realTimeClock,
-                                                            timestampSync, realTimeClockSync);
+                                                            timestampSync, realTimeClockSync, null, null);
 
                     this.values.add(value);
                 }

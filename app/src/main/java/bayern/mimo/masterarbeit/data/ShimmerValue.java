@@ -32,13 +32,16 @@ public class ShimmerValue {
     private Double timestampSync;
     private Double realTimeClockSync;
 
+    private Integer drrId;
+    private String shimmerMac;
+
     public ShimmerValue(Double accelLnX, Double accelLnY, Double accelLnZ,
                         Double accelWrX, Double accelWrY, Double accelWrZ,
                         Double gyroX, Double gyroY, Double gyroZ,
                         Double magX, Double magY, Double magZ,
                         Double temperature, Double pressure,
                         Double timestamp, Double realTimeClock,
-                        Double timestampSync, Double realTimeClockSync) {
+                        Double timestampSync, Double realTimeClockSync, Integer drrId, String shimmerMac) {
         this.accelLnX = accelLnX;
         this.accelLnY = accelLnY;
         this.accelLnZ = accelLnZ;
@@ -64,6 +67,9 @@ public class ShimmerValue {
 
         this.timestampSync = timestampSync;
         this.realTimeClockSync = realTimeClockSync;
+
+        this.drrId = drrId;
+        this.shimmerMac = shimmerMac;
     }
 
     public Double getAccelLnX() {

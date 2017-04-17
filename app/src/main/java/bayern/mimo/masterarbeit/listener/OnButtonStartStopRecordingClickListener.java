@@ -47,7 +47,7 @@ public class OnButtonStartStopRecordingClickListener implements View.OnClickList
 
                     AppSensors.setCategory(category);
                     AppSensors.setDetail(detail);
-                    AppSensors.commit();
+                    AppSensors.commit(caller);
 
                     if (dialog != null) dialog.dismiss();
                 }

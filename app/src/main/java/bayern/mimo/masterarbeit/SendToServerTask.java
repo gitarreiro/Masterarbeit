@@ -102,7 +102,11 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
     protected void onPostExecute(String result) {
         System.out.println("Got result: " + result);
 
+
+
+
         if(result.startsWith("DRRID")){
+            System.out.println("found DRRID");
             String[] split = result.split(":");
             int drrID = -1;
             try {
@@ -115,6 +119,16 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
                 DataHelper.setUploadCompleted(drrID);
             }
 
+            return;
+        }
+
+        if(result == null){
+            System.out.println("Result is null");
+            return;
+        }
+
+        if(result.isEmpty()){
+            System.out.println("Result is empty");
             return;
         }
 
@@ -155,6 +169,15 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
         System.out.println("in requestSucceeded(drr)");
         //TODO send all the shit
 
+
+
+
+        //TODO upload result starts with: DRRID_SHIMMER_UPLOAD
+
+
+
+
+
         String uploadPath = Config.SERVER_API_URL + Config.SHIMMER_UPLOAD_PATH;
 
         //Map<Shimmer, ShimmerHandler> shimmerSensors = AppSensors.getShimmerValues();
@@ -170,35 +193,36 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
             //List<ShimmerValue> values = handler.getValues();
 
             List<ShimmerValue> values = record.getShimmerValues().get(shimmer);
-            JSONArray sensorAsJson = new JSONArray();
+
+            System.out.println("Number of values is " + values.size());
 
             //TODO JSON bauen
             for (ShimmerValue value : values) {
                 if (value.getTimestamp() == null) continue;
                 JSONObject valueAsJson = new JSONObject();
                 try {
-                    valueAsJson.put("AccelLnX", value.getAccelLnX());
-                    valueAsJson.put("AccelLnY", value.getAccelLnY());
-                    valueAsJson.put("AccelLnZ", value.getAccelLnZ());
-                    valueAsJson.put("AccelWrX", value.getAccelWrX());
-                    valueAsJson.put("AccelWrY", value.getAccelWrY());
-                    valueAsJson.put("AccelWrZ", value.getAccelWrZ());
-                    valueAsJson.put("GyroX", value.getGyroX());
-                    valueAsJson.put("GyroY", value.getGyroY());
-                    valueAsJson.put("GyroZ", value.getGyroZ());
-                    valueAsJson.put("MagX", value.getMagX());
-                    valueAsJson.put("MagY", value.getMagY());
-                    valueAsJson.put("MagZ", value.getMagZ());
-                    valueAsJson.put("Temperature", value.getTemperature());
-                    valueAsJson.put("Pressure", value.getPressure());
-                    valueAsJson.put("Timestamp", value.getTimestamp());
-                    valueAsJson.put("RealTimeClock", value.getRealTimeClock());
-                    valueAsJson.put("TimestampSync", value.getTimestampSync());
-                    valueAsJson.put("RealTimeClockSync", value.getRealTimeClockSync());
+                    valueAsJson.put("ACCEL_LN_X", value.getAccelLnX());
+                    valueAsJson.put("ACCEL_LN_Y", value.getAccelLnY());
+                    valueAsJson.put("ACCEL_LN_Z", value.getAccelLnZ());
+                    valueAsJson.put("ACCEL_WR_X", value.getAccelWrX());
+                    valueAsJson.put("ACCEL_WR_Y", value.getAccelWrY());
+                    valueAsJson.put("ACCEL_WR_Z", value.getAccelWrZ());
+                    valueAsJson.put("GYRO_X", value.getGyroX());
+                    valueAsJson.put("GYRO_Y", value.getGyroY());
+                    valueAsJson.put("GYRO_Z", value.getGyroZ());
+                    valueAsJson.put("MAG_X", value.getMagX());
+                    valueAsJson.put("MAG_Y", value.getMagY());
+                    valueAsJson.put("MAG_Z", value.getMagZ());
+                    valueAsJson.put("TEMPERATURE", value.getTemperature());
+                    valueAsJson.put("PRESSURE", value.getPressure());
+                    valueAsJson.put("TIMESTAMP", value.getTimestamp());
+                    valueAsJson.put("REAL_TIME_CLOCK", value.getRealTimeClock());
+                    valueAsJson.put("TIMESTAMP_SYNC", value.getTimestampSync());
+                    valueAsJson.put("REAL_TIME_CLOCK_SYNC", value.getRealTimeClockSync());
                     valueAsJson.put("DataRecordingRequestID", drr.getId());
                     valueAsJson.put("SensorMAC", shimmer.getBluetoothAddress());
 
-                    sensorAsJson.put(valueAsJson);
+                    allValuesJson.put(valueAsJson);
 
                     //System.out.println(jsonValues.toString(2));
 
@@ -206,7 +230,6 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
                     e.printStackTrace();
                 }
 
-                allValuesJson.put(sensorAsJson);
 
             }
 
@@ -223,7 +246,8 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
 
 
 
-            this.execute(uploadPath, allValuesJson.toString());
+            new SendToServerTask(record).execute(uploadPath, allValuesJson.toString());
+            //this.execute(uploadPath, allValuesJson.toString());
 
 
             //System.out.println("-_-_-_-_-_-_-UPLOADING DONE-_-_-_-_-_-_-");

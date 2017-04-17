@@ -42,7 +42,7 @@ public class ShowAndUploadDataActivity extends AppCompatActivity {
         setContentView(R.layout.activity_show_upload_data);
 
 
-        this.recordingAdapter = new RecordingAdapter(this, DataHelper.getDataRecordings());
+        this.recordingAdapter = new RecordingAdapter(this, DataHelper.getDataRecordings(this));
 
         ListView listViewData = (ListView) findViewById(R.id.listViewData);
         listViewData.setAdapter(this.recordingAdapter);
