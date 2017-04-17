@@ -95,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
         permissions[2] = Manifest.permission.ACCESS_COARSE_LOCATION;
         permissions[3] = Manifest.permission.INTERNET;
         permissions[4] = Manifest.permission.ACCESS_NETWORK_STATE;
+        permissions[5] = Manifest.permission.ACCESS_FINE_LOCATION;
         Util.checkPermissions(this, permissions);
 
         initView();

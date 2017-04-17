@@ -26,6 +26,7 @@ public class AppSensors {
     private static boolean isInitialized;
     private static Map<Shimmer, ShimmerHandler> shimmerSensors;
     private static MALocationListener locationListener;
+    private static LocationManager locationManager;
 
     private static DataRecording record;
     private static Date startTime;
@@ -41,16 +42,12 @@ public class AppSensors {
         shimmerSensors = new HashMap<>();
 
         locationListener = new MALocationListener();
-        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-
-        //TODO location listener
-
+        locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
         isInitialized = true;
     }
 
     public static void addSensor(Shimmer sensor, ShimmerHandler handler) {
-
         shimmerSensors.put(sensor, handler);
     }
 
@@ -70,7 +67,15 @@ public class AppSensors {
             shimmer.startStreaming();
         }
 
+
         startTime = new Date();
+
+        try {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        }
+
 
         return true;
     }
@@ -81,6 +86,11 @@ public class AppSensors {
             shimmer.stopStreaming();
         }
 
+        try {
+            locationManager.removeUpdates(locationListener);
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        }
         //DataHelper.init();
         //DataHelper.addRecord(record, true);
     }

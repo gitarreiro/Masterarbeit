@@ -1,5 +1,7 @@
 package bayern.mimo.masterarbeit.data;
 
+import android.location.Location;
+
 import com.shimmerresearch.android.Shimmer;
 
 import java.text.SimpleDateFormat;
@@ -19,6 +21,8 @@ public class DataRecording {
     private Date endDate;
     private String category;
     private String detail;
+
+    private List<Location> locations;
 
     public DataRecording(String category, String detail, Map<Shimmer, List<ShimmerValue>> shimmerValues, Date startDate, Date endDate){
         this.drrID = -1;
