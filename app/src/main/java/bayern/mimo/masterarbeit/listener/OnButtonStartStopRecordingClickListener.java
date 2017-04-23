@@ -37,13 +37,27 @@ public class OnButtonStartStopRecordingClickListener implements View.OnClickList
                     }
 
 
-                    System.out.println("Tag: " + v.getTag());
+                    System.out.println("Tag vor split: " + v.getTag());
 
-                    String[] split = v.getTag().toString().split("|");
+                    String[] split = v.getTag().toString().split("\\|");
+
+                    System.out.println("split is:");
+
+                    for(String s : split){
+                        System.out.println("item '" + s + "'");
+                    }
+
                     String category = split[0];
                     String detail = "";
                     if(split.length>1)
                         detail = split[1];
+
+                    System.out.println("AFTER SPLIT");
+
+                    System.out.println("category extracted: "+category);
+                    System.out.println("detail extracted: "+detail);
+
+                    System.out.println("_____________");
 
                     AppSensors.setCategory(category);
                     AppSensors.setDetail(detail);

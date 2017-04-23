@@ -47,7 +47,7 @@ public class ConnectSensorsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connect_sensors);
 
-        AppSensors.init();
+        AppSensors.init(this);
 
 
         init();
@@ -100,7 +100,7 @@ public class ConnectSensorsActivity extends AppCompatActivity {
                 try {
                     handler = new ShimmerHandler(ConnectSensorsActivity.this);
 
-                    shimmer = new Shimmer(ConnectSensorsActivity.this, handler, device.getAddress(), 51.2, 0, 0, Shimmer.SENSOR_ACCEL | Shimmer.SENSOR_GYRO | Shimmer.SENSOR_MAG, false);
+                    shimmer = new Shimmer(ConnectSensorsActivity.this, handler, device.getAddress(), 100, 100, 0, Shimmer.SENSOR_ACCEL | Shimmer.SENSOR_GYRO | Shimmer.SENSOR_MAG , false);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

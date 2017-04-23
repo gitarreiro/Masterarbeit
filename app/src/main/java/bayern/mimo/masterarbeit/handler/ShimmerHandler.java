@@ -44,6 +44,26 @@ public class ShimmerHandler extends Handler {
                     Double accelWrY = getValue(msg, Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_WR_Y);
                     Double accelWrZ = getValue(msg, Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_WR_Z);
 
+                    System.out.println("accelLnX: "+accelLnX);
+                    System.out.println("accelWrX: "+accelWrX);
+
+
+
+
+                    ObjectCluster objectCluster =  (ObjectCluster) msg.obj;
+                    Collection<FormatCluster> accelXFormats = objectCluster.mPropertyCluster.get(Configuration.Shimmer2.ObjectClusterSensorName.ACCEL_X);  // first retrieve all the possible formats for the current sensor device
+                    FormatCluster formatCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(accelXFormats,"CAL")); // retrieve the calibrated data
+                    if (formatCluster!=null){
+                        Log.d("CalibratedData",objectCluster.mMyName + " AccelX: " + formatCluster.mData + " "+ formatCluster.mUnits);
+                    }else{
+                        System.out.println("formatCluster is null");
+                    }
+
+
+
+
+
+
                     Double gyroX = getValue(msg, Configuration.Shimmer3.ObjectClusterSensorName.GYRO_X);
                     Double gyroY = getValue(msg, Configuration.Shimmer3.ObjectClusterSensorName.GYRO_Y);
                     Double gyroZ = getValue(msg, Configuration.Shimmer3.ObjectClusterSensorName.GYRO_Z);

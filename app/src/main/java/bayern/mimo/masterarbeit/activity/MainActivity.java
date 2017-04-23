@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        String[] permissions = new String[5];
+        String[] permissions = new String[6];
         permissions[0] = Manifest.permission.BLUETOOTH;
         permissions[1] = Manifest.permission.BLUETOOTH_ADMIN;
         permissions[2] = Manifest.permission.ACCESS_COARSE_LOCATION;

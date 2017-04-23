@@ -24,12 +24,13 @@ public class DataRecording {
 
     private List<Location> locations;
 
-    public DataRecording(String category, String detail, Map<Shimmer, List<ShimmerValue>> shimmerValues, Date startDate, Date endDate){
+    public DataRecording(String category, String detail, Map<Shimmer, List<ShimmerValue>> shimmerValues, List<Location> locations, Date startDate, Date endDate){
         this.drrID = -1;
         this.isUploaded = false; //TODO vllt. ändern
         this.category = category;
         this.detail = detail;
         this.shimmerValues = shimmerValues;
+        this.locations = locations;
         this.startDate = startDate;
         this.endDate = endDate;
     }

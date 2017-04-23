@@ -4,6 +4,7 @@ import android.content.Context;
 import android.location.LocationManager;
 
 import com.shimmerresearch.android.Shimmer;
+import com.shimmerresearch.driver.SensorDetails;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -63,11 +64,6 @@ public class AppSensors {
     public static boolean startRecording() {
         if (!isInitialized) return false; //TODO Fehlermeldung ausgeben
 
-        for (Shimmer shimmer : shimmerSensors.keySet()) {
-            shimmer.startStreaming();
-        }
-
-
         startTime = new Date();
 
         try {
@@ -75,7 +71,6 @@ public class AppSensors {
         } catch (SecurityException e) {
             e.printStackTrace();
         }
-
 
         return true;
     }
@@ -91,8 +86,6 @@ public class AppSensors {
         } catch (SecurityException e) {
             e.printStackTrace();
         }
-        //DataHelper.init();
-        //DataHelper.addRecord(record, true);
     }
 
 
@@ -110,19 +103,24 @@ public class AppSensors {
 
     public static void setCategory(String category) {
         AppSensors.category = category;
+        System.out.println("set category = "+category);
     }
 
     public static void setDetail(String detail) {
         AppSensors.detail = detail;
+        System.out.println("set detail = "+detail);
     }
 
     public static void commit(Context context) {
         System.out.println("AppSensors.commit()");
+
+
+
         Map<Shimmer, List<ShimmerValue>> recordings = new HashMap<>();
         for (Shimmer key : shimmerSensors.keySet())
             recordings.put(key, shimmerSensors.get(key).getValues());
 
-        record = new DataRecording(category, detail, recordings, startTime, new Date());
+        record = new DataRecording(category, detail, recordings, locationListener.getRecordedLocations(), startTime, new Date());
 
         DataHelper.init(context);
         DataHelper.addRecord(record, true, context);
