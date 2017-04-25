@@ -8,33 +8,38 @@ import java.util.Date;
 
 public class DataRecordingRequest {
 
-    private int id;
+    private String guid;
+    private int serverID;
     private String username;
     private Date timestamp;
     private String shimmer1MAC;
-    private String shimmer1GUID;
     private String shimmer2MAC;
-    private String shimmer2GUID;
     private String heatMAC;
-    private String heatGUID;
+    private boolean isUploaded;
 
-    public DataRecordingRequest(int id, String username, Date timestamp,
-                                String shimmer1MAC, String shimmer1GUID,
-                                String shimmer2MAC, String shimmer2GUID,
-                                String heatMAC, String heatGUID) {
-        this.id = id;
+    public DataRecordingRequest(String guid, String username, Date timestamp,
+                                String shimmer1MAC,
+                                String shimmer2MAC,
+                                String heatMAC, boolean isUploaded) {
+        this.guid = guid;
         this.username = username;
         this.timestamp = timestamp;
         this.shimmer1MAC = shimmer1MAC;
-        this.shimmer1GUID = shimmer1GUID;
         this.shimmer2MAC = shimmer2MAC;
-        this.shimmer2GUID = shimmer2GUID;
         this.heatMAC = heatMAC;
-        this.heatGUID = heatGUID;
+        this.isUploaded = isUploaded;
     }
 
-    public int getId() {
-        return id;
+    public String getGuid() {
+        return guid;
+    }
+
+    public void setServerID(int serverID) {
+        this.serverID = serverID;
+    }
+
+    public int getServerID() {
+        return serverID;
     }
 
     public String getUsername() {
@@ -49,23 +54,19 @@ public class DataRecordingRequest {
         return shimmer1MAC;
     }
 
-    public String getShimmer1GUID() {
-        return shimmer1GUID;
-    }
-
     public String getShimmer2MAC() {
         return shimmer2MAC;
-    }
-
-    public String getShimmer2GUID() {
-        return shimmer2GUID;
     }
 
     public String getHeatMAC() {
         return heatMAC;
     }
 
-    public String getHeatGUID() {
-        return heatGUID;
+    public boolean isUploaded() {
+        return isUploaded;
+    }
+
+    public void setUploaded(){
+        this.isUploaded = true;
     }
 }

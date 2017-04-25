@@ -8,7 +8,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,16 +19,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
-import bayern.mimo.masterarbeit.activity.StartRideActivity;
-import bayern.mimo.masterarbeit.common.AppSensors;
 import bayern.mimo.masterarbeit.data.DataHelper;
 import bayern.mimo.masterarbeit.data.DataRecording;
 import bayern.mimo.masterarbeit.data.DataRecordingRequest;
 import bayern.mimo.masterarbeit.data.ShimmerValue;
-import bayern.mimo.masterarbeit.handler.ShimmerHandler;
-import bayern.mimo.masterarbeit.listener.OnButtonSendDataToServerClickListener;
 import bayern.mimo.masterarbeit.util.Config;
 
 /**
@@ -145,20 +139,16 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
                 try {
                     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
                     timestamp = format.parse(json.getString("Timestamp").split("\\.")[0]);
-                }
-                catch(ParseException pe) {
+                } catch(ParseException pe) {
                     throw new IllegalArgumentException();
                 }
 
                 String shimmer1MAC = json.getString("Shimmer1MAC");
-                String shimmer1GUID = json.getString("Shimmer1GUID");
                 String shimmer2MAC = json.getString("Shimmer2MAC");
-                String shimmer2GUID = json.getString("Shimmer2GUID");
                 String heatMAC = json.getString("HeatMAC");
-                String heatGUID = json.getString("HeatGUID");
 
-                DataRecordingRequest drr = new DataRecordingRequest(id, username, timestamp, shimmer1MAC, shimmer1GUID, shimmer2MAC, shimmer2GUID, heatMAC, heatGUID);
-                /*caller.*/requestSucceeded(drr);
+                DataRecordingRequest drr = new DataRecordingRequest(id, username, timestamp, shimmer1MAC, shimmer2MAC, heatMAC, true); //TODO get from DataRecording oder so
+                requestSucceeded(drr);
             }
         }catch(JSONException e){
             e.printStackTrace();
@@ -167,10 +157,6 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
 
     private void requestSucceeded(DataRecordingRequest drr) {
         System.out.println("in requestSucceeded(drr)");
-        //TODO send all the shit
-
-
-
 
         //TODO upload result starts with: DRRID_SHIMMER_UPLOAD
 
@@ -185,9 +171,6 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
 
 
         for(Shimmer shimmer : record.getShimmerValues().keySet()){
-
-
-
 
             //himmerHandler handler = shimmerSensors.get(shimmer);
             //List<ShimmerValue> values = handler.getValues();
@@ -219,7 +202,7 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
                     valueAsJson.put("REAL_TIME_CLOCK", value.getRealTimeClock());
                     valueAsJson.put("TIMESTAMP_SYNC", value.getTimestampSync());
                     valueAsJson.put("REAL_TIME_CLOCK_SYNC", value.getRealTimeClockSync());
-                    valueAsJson.put("DataRecordingRequestID", drr.getId());
+                    valueAsJson.put("DataRecordingRequestID", drr.getGuid());
                     valueAsJson.put("SensorMAC", shimmer.getBluetoothAddress());
 
                     allValuesJson.put(valueAsJson);

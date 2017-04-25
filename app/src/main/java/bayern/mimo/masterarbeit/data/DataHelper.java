@@ -3,12 +3,11 @@ package bayern.mimo.masterarbeit.data;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.location.Location;
 
 import com.shimmerresearch.android.Shimmer;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +40,7 @@ public class DataHelper {
 
         records = new ArrayList<>();
         records.addAll(getRecordsFromDB(context));
+
         isInitialized = true;
     }
 
@@ -50,11 +50,11 @@ public class DataHelper {
         System.out.println("recordings vor DEBUG: " + records.size());
 
         if (DEBUG) {
-            DataRecording record = new DataRecording("Test", "Desc", new HashMap<Shimmer, List<ShimmerValue>>(), new Date(), new Date());
+            /*DataRecording record = new DataRecording("Test", "Desc", new HashMap<Shimmer, List<ShimmerValue>>(), new Date(), new Date());
             List<DataRecording> tmpRecords = new ArrayList<>();
             tmpRecords.add(record);
             //return tmpRecords;
-            records.addAll(tmpRecords);
+            records.addAll(tmpRecords);*/
         }
 
 
@@ -73,7 +73,66 @@ public class DataHelper {
 
     private static void addRecordToDB(DataRecording record, Context context) {
         SQLiteDatabase maDB = context.openOrCreateDatabase(Config.DB_NAME, MODE_PRIVATE, null);
-        maDB.execSQL("CREATE TABLE IF NOT EXISTS ShimmerValues(ID INTEGER PRIMARY KEY AUTOINCREMENT, ACCEL_LN_X REAL, ACCEL_LN_Y REAL, ACCEL_LN_Z REAL, ACCEL_WR_X REAL, ACCEL_WR_Y REAL, ACCEL_WR_Z REAL, GYRO_X REAL, GYRO_Y  REAL, GYRO_Z REAL, MAG_X REAL, MAG_Y REAL, MAG_Z REAL, TEMPERATURE REAL, PRESSURE REAL, TIMESTAMP REAL, REAL_TIME_CLOCK REAL, TIMESTAMP_SYNC REAL, REAL_TIME_CLOCK_SYNC REAL,DataRecordingRequestID INTEGER, SensorMAC VARCHAR, Uploaded INTEGER );");
+
+/*
+private String guid;
+    private int serverID;
+    private String username;
+    private Date timestamp;
+    private String shimmer1MAC;
+    private String shimmer2MAC;
+    private String heatMAC;
+    private boolean isUploaded;
+ */
+
+        maDB.execSQL("CREATE TABLE IF NOT EXISTS DataRecordingRequest ("
+                + "GUID VARCHAR,"
+                + "SERVERID INTEGER,"
+                + "USERNAME VARCHAR"
+                + "TIMESTAMP REAL"
+                + "SHIMMER1MAC VARCHAR"
+                + "SHIMMER2MAC VARCHAR"
+                + "HEATMAC VARCHAR"
+                + "ISUPLOADED INTEGER"
+                + ");"
+        );
+
+        maDB.execSQL("INSERT INTO DataRecordingRequest (GUID, SERVERID, USERNAME, TIMESTAMP, SHIMMER1MAC, SHIMMER2MAC, HEATMAC, ISUPLOADED)"
+                + "VALUES(" + record.getDrr().getGuid()
+                + "," + record.getDrr().getServerID()
+                + "," + record.getDrr().getUsername()
+                + "," + record.getDrr().getTimestamp()
+                + "," + record.getDrr().getShimmer1MAC()
+                + "," + record.getDrr().getShimmer2MAC()
+                + "," + record.getDrr().getHeatMAC()
+                + "," + "0"
+                + ");"
+        );
+
+
+        maDB.execSQL("CREATE TABLE IF NOT EXISTS ShimmerValues"
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + "ACCEL_LN_X REAL, "
+                + "ACCEL_LN_Y REAL, "
+                + "ACCEL_LN_Z REAL, "
+                + "ACCEL_WR_X REAL, "
+                + "ACCEL_WR_Y REAL, "
+                + "ACCEL_WR_Z REAL, "
+                + "GYRO_X REAL, "
+                + "GYRO_Y  REAL, "
+                + "GYRO_Z REAL, "
+                + "MAG_X REAL, "
+                + "MAG_Y REAL, MAG_Z REAL, "
+                + "TEMPERATURE REAL, "
+                + "PRESSURE REAL, "
+                + "TIMESTAMP REAL, "
+                + "REAL_TIME_CLOCK REAL, "
+                + "TIMESTAMP_SYNC REAL, "
+                + "REAL_TIME_CLOCK_SYNC REAL,"
+                + "DataRecordingRequestID VARCHAR, "
+                + "SensorMAC VARCHAR "
+                + ");"
+        );
 
         Map<Shimmer, List<ShimmerValue>> map = record.getShimmerValues();
         for (Shimmer shimmer : map.keySet()) {
@@ -82,19 +141,65 @@ public class DataHelper {
                 maDB.execSQL("INSERT INTO ShimmerValues (" +
 
                         "ACCEL_LN_X, ACCEL_LN_Y, ACCEL_LN_Z, ACCEL_WR_X, ACCEL_WR_Y, ACCEL_WR_Z, GYRO_X, GYRO_Y, GYRO_Z, MAG_X, MAG_Y, MAG_Z,"
-                        +" TEMPERATURE, PRESSURE, TIMESTAMP, REAL_TIME_CLOCK, TIMESTAMP_SYNC, REAL_TIME_CLOCK_SYNC,DataRecordingRequestID, SensorMAC, Uploaded)"
+                        + " TEMPERATURE, PRESSURE, TIMESTAMP, REAL_TIME_CLOCK, TIMESTAMP_SYNC, REAL_TIME_CLOCK_SYNC,DataRecordingRequestID, SensorMAC)"
 
 
                         +
-                        " VALUES(" + value.getAccelLnX() + "," + value.getAccelLnY() + "," + value.getAccelLnZ() +
-                        "," + value.getAccelWrX() + "," + value.getAccelWrY() + "," + value.getAccelWrZ() +
-                        "," + value.getGyroX() + "," + value.getGyroY() + "," + value.getGyroZ() +
-                        "," + value.getMagX() + "," + value.getMagY() + "," + value.getMagZ() +
-                        "," + value.getTemperature() + "," + value.getPressure() + "," + value.getTimestamp() +
-                        "," + value.getRealTimeClock() + "," + value.getTimestampSync() + "," + value.getRealTimeClockSync() + ","
-                        + record.getDrrID() + ",'" + shimmer.getBluetoothAddress() + "', " + "0" +  ");");
+                        " VALUES("
+                        + value.getAccelLnX() + ","
+                        + value.getAccelLnY() + ","
+                        + value.getAccelLnZ() + ","
+                        + value.getAccelWrX() + ","
+                        + value.getAccelWrY() + ","
+                        + value.getAccelWrZ() + ","
+                        + value.getGyroX() + ","
+                        + value.getGyroY() + ","
+                        + value.getGyroZ() + ","
+                        + value.getMagX() + ","
+                        + value.getMagY() + ","
+                        + value.getMagZ() + ","
+                        + value.getTemperature() + ","
+                        + value.getPressure() + ","
+                        + value.getTimestamp() + ","
+                        + value.getRealTimeClock() + ","
+                        + value.getTimestampSync() + ","
+                        + value.getRealTimeClockSync() + ","
+                        + record.getDrr().getGuid() + ",'"
+                        + shimmer.getBluetoothAddress() + "'"
+                        + ");"
+                );
             }
         }
+
+
+        maDB.execSQL("CREATE TABLE IF NOT EXISTS Locations"
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + "LATITUDE REAL, "
+                + "LONGITUDE REAL, "
+                + "TIMESTAMP REAL, "
+                + "ACCURACY REAL, "
+                + "ALTITUDE REAL, "
+                + "ELAPSEDREALTIMENANOS REAL, "
+                + "SPEED REAL, "
+                + "DataRecordingRequestID VARCHAR, "
+                + ");"
+        );
+
+        for (Location location : record.getLocations()) {
+            maDB.execSQL(
+                    "INSERT INTO Locations (LATITUDE, LONGITUDE, TIMESTAMP, ACCURACY, ALTITUDE, ELAPSEDREALTIMENANOS, SPEED, DataRecordingRequestID)"
+                            +" VALUES ("+location.getLatitude()
+                            + ","+location.getLongitude()
+                            + ","+location.getTime()
+                            + ","+location.getAccuracy()
+                            + ","+location.getAltitude()
+                            + ","+location.getElapsedRealtimeNanos()
+                            + ","+location.getSpeed()
+                            + ","+record.getDrr().getGuid()
+                            + ");"
+            );
+        }
+
 
     }
 
@@ -144,7 +249,7 @@ public class DataHelper {
 
     public static void setUploadCompleted(int drrID) {
         for (DataRecording record : records) {
-            if (record.getDrrID() == drrID) {
+            if (record.getDrr().getServerID() == drrID) {
                 record.setUploaded(true);
                 break;
             }

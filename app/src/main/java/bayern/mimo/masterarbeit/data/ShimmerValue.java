@@ -144,4 +144,11 @@ public class ShimmerValue {
         return timestampSync;
     }
 
+    public Integer getDrrId() {
+        return drrId;
+    }
+
+    public String getShimmerMac() {
+        return shimmerMac;
+    }
 }

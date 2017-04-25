@@ -88,7 +88,7 @@ public class OnButtonSendDataToServerClickListener implements View.OnClickListen
                     jsonValue.put("RealTimeClock", value.getRealTimeClock());
                     jsonValue.put("TimestampSync", value.getTimestampSync());
                     jsonValue.put("RealTimeClockSync", value.getRealTimeClockSync());
-                    jsonValue.put("DataRecordingRequestID", drr.getId());
+                    jsonValue.put("DataRecordingRequestID", drr.getGuid());
 
                     jsonValues.put(jsonValue);
 

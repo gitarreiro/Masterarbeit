@@ -4,16 +4,17 @@ import android.content.Context;
 import android.location.LocationManager;
 
 import com.shimmerresearch.android.Shimmer;
-import com.shimmerresearch.driver.SensorDetails;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import bayern.mimo.masterarbeit.data.DataHelper;
 import bayern.mimo.masterarbeit.data.DataRecording;
+import bayern.mimo.masterarbeit.data.DataRecordingRequest;
 import bayern.mimo.masterarbeit.data.ShimmerValue;
 import bayern.mimo.masterarbeit.handler.ShimmerHandler;
 import bayern.mimo.masterarbeit.listener.MALocationListener;
@@ -103,24 +104,39 @@ public class AppSensors {
 
     public static void setCategory(String category) {
         AppSensors.category = category;
-        System.out.println("set category = "+category);
+        System.out.println("set category = " + category);
     }
 
     public static void setDetail(String detail) {
         AppSensors.detail = detail;
-        System.out.println("set detail = "+detail);
+        System.out.println("set detail = " + detail);
     }
 
     public static void commit(Context context) {
         System.out.println("AppSensors.commit()");
 
 
+        String guid = UUID.randomUUID().toString();
+
+        //TODO testuser ändern
+
+        Object[] sensors = shimmerSensors.keySet().toArray();
+
+        String shimmer1MAC = null;
+        if (sensors.length > 0)
+            shimmer1MAC = ((Shimmer) sensors[0]).getBluetoothAddress();
+
+        String shimmer2MAC = null;
+        if (sensors.length > 1)
+            shimmer2MAC = ((Shimmer) sensors[1]).getBluetoothAddress();
+
+        DataRecordingRequest drr = new DataRecordingRequest(guid, "testuser", startTime, shimmer1MAC, shimmer2MAC, null, false);//TODO no heat sensor supported at the moment
 
         Map<Shimmer, List<ShimmerValue>> recordings = new HashMap<>();
         for (Shimmer key : shimmerSensors.keySet())
             recordings.put(key, shimmerSensors.get(key).getValues());
 
-        record = new DataRecording(category, detail, recordings, locationListener.getRecordedLocations(), startTime, new Date());
+        record = new DataRecording(category, detail, recordings, locationListener.getRecordedLocations(), startTime, new Date(), drr);
 
         DataHelper.init(context);
         DataHelper.addRecord(record, true, context);
