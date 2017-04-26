@@ -17,11 +17,12 @@ public class DataRecordingRequest {
     private String heatMAC;
     private boolean isUploaded;
 
-    public DataRecordingRequest(String guid, String username, Date timestamp,
+    public DataRecordingRequest(String guid, int serverID, String username, Date timestamp,
                                 String shimmer1MAC,
                                 String shimmer2MAC,
                                 String heatMAC, boolean isUploaded) {
         this.guid = guid;
+        this.serverID = serverID;
         this.username = username;
         this.timestamp = timestamp;
         this.shimmer1MAC = shimmer1MAC;
@@ -34,9 +35,9 @@ public class DataRecordingRequest {
         return guid;
     }
 
-    public void setServerID(int serverID) {
-        this.serverID = serverID;
-    }
+    //public void setServerID(int serverID) {
+    //    this.serverID = serverID;
+    //}
 
     public int getServerID() {
         return serverID;

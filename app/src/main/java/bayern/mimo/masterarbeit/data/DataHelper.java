@@ -250,7 +250,7 @@ private String guid;
     public static void setUploadCompleted(int drrID) {
         for (DataRecording record : records) {
             if (record.getDrr().getServerID() == drrID) {
-                record.setUploaded(true);
+                record.setUploaded();
                 break;
             }
         }

@@ -19,7 +19,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
+import bayern.mimo.masterarbeit.common.AppSensors;
 import bayern.mimo.masterarbeit.data.DataHelper;
 import bayern.mimo.masterarbeit.data.DataRecording;
 import bayern.mimo.masterarbeit.data.DataRecordingRequest;
@@ -147,7 +149,9 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
                 String shimmer2MAC = json.getString("Shimmer2MAC");
                 String heatMAC = json.getString("HeatMAC");
 
-                DataRecordingRequest drr = new DataRecordingRequest(id, username, timestamp, shimmer1MAC, shimmer2MAC, heatMAC, true); //TODO get from DataRecording oder so
+                String guid = UUID.randomUUID().toString();
+
+                DataRecordingRequest drr = new DataRecordingRequest(guid, id, username, timestamp, shimmer1MAC, shimmer2MAC, heatMAC, true); //TODO get from DataRecording oder so
                 requestSucceeded(drr);
             }
         }catch(JSONException e){
@@ -157,6 +161,8 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
 
     private void requestSucceeded(DataRecordingRequest drr) {
         System.out.println("in requestSucceeded(drr)");
+
+        AppSensors.setDrr(drr);
 
         //TODO upload result starts with: DRRID_SHIMMER_UPLOAD
 
@@ -237,5 +243,8 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
 
             //TODO send
         }
+
     }
+
+
 }

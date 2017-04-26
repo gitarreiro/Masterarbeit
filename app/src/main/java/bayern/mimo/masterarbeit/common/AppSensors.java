@@ -34,6 +34,7 @@ public class AppSensors {
     private static Date startTime;
     private static String category;
     private static String detail;
+    private static DataRecordingRequest drr;
     //TODO add category choice
 
     private AppSensors() {
@@ -112,11 +113,15 @@ public class AppSensors {
         System.out.println("set detail = " + detail);
     }
 
+    public static void setDrr(DataRecordingRequest drr){
+        AppSensors.drr = drr;
+    }
+
     public static void commit(Context context) {
         System.out.println("AppSensors.commit()");
 
 
-        String guid = UUID.randomUUID().toString();
+
 
         //TODO testuser ändern
 
@@ -130,7 +135,7 @@ public class AppSensors {
         if (sensors.length > 1)
             shimmer2MAC = ((Shimmer) sensors[1]).getBluetoothAddress();
 
-        DataRecordingRequest drr = new DataRecordingRequest(guid, "testuser", startTime, shimmer1MAC, shimmer2MAC, null, false);//TODO no heat sensor supported at the moment
+        //DataRecordingRequest drr = new DataRecordingRequest(guid, "testuser", startTime, shimmer1MAC, shimmer2MAC, null, false);//TODO no heat sensor supported at the moment
 
         Map<Shimmer, List<ShimmerValue>> recordings = new HashMap<>();
         for (Shimmer key : shimmerSensors.keySet())
