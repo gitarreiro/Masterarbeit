@@ -151,7 +151,8 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
 
                 String guid = UUID.randomUUID().toString();
 
-                DataRecordingRequest drr = new DataRecordingRequest(guid, id, username, timestamp, shimmer1MAC, shimmer2MAC, heatMAC, true); //TODO get from DataRecording oder so
+                DataRecordingRequest drr = AppSensors.getDrr();
+                        //new DataRecordingRequest(guid, id, username, timestamp, shimmer1MAC, shimmer2MAC, heatMAC, true, null, null, null, null); //TODO get from DataRecording oder so
                 requestSucceeded(drr);
             }
         }catch(JSONException e){
@@ -164,9 +165,6 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
 
         AppSensors.setDrr(drr);
 
-        //TODO upload result starts with: DRRID_SHIMMER_UPLOAD
-
-
 
 
 
@@ -176,12 +174,12 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
         JSONArray allValuesJson = new JSONArray();
 
 
-        for(Shimmer shimmer : record.getShimmerValues().keySet()){
+        for(String shimmerAddress : record.getShimmerValues().keySet()){
 
-            //himmerHandler handler = shimmerSensors.get(shimmer);
+            //himmerHandler handler = shimmerSensors.get(shimmerAddress);
             //List<ShimmerValue> values = handler.getValues();
 
-            List<ShimmerValue> values = record.getShimmerValues().get(shimmer);
+            List<ShimmerValue> values = record.getShimmerValues().get(shimmerAddress);
 
             System.out.println("Number of values is " + values.size());
 
@@ -209,7 +207,7 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
                     valueAsJson.put("TIMESTAMP_SYNC", value.getTimestampSync());
                     valueAsJson.put("REAL_TIME_CLOCK_SYNC", value.getRealTimeClockSync());
                     valueAsJson.put("DataRecordingRequestID", drr.getGuid());
-                    valueAsJson.put("SensorMAC", shimmer.getBluetoothAddress());
+                    valueAsJson.put("SensorMAC", shimmerAddress);
 
                     allValuesJson.put(valueAsJson);
 

@@ -105,11 +105,13 @@ public class AppSensors {
 
     public static void setCategory(String category) {
         AppSensors.category = category;
+//        drr.setCategory(category);
         System.out.println("set category = " + category);
     }
 
     public static void setDetail(String detail) {
         AppSensors.detail = detail;
+  //      drr.setDetail(detail);
         System.out.println("set detail = " + detail);
     }
 
@@ -135,15 +137,25 @@ public class AppSensors {
         if (sensors.length > 1)
             shimmer2MAC = ((Shimmer) sensors[1]).getBluetoothAddress();
 
-        //DataRecordingRequest drr = new DataRecordingRequest(guid, "testuser", startTime, shimmer1MAC, shimmer2MAC, null, false);//TODO no heat sensor supported at the moment
+        String guid = UUID.randomUUID().toString();
+        DataRecordingRequest drr = new DataRecordingRequest(guid,-1, "testuser", startTime, shimmer1MAC, shimmer2MAC, null, false, null, null, null, null);//TODO no heat sensor supported at the moment
 
-        Map<Shimmer, List<ShimmerValue>> recordings = new HashMap<>();
+        Map<String, List<ShimmerValue>> recordings = new HashMap<>();
         for (Shimmer key : shimmerSensors.keySet())
-            recordings.put(key, shimmerSensors.get(key).getValues());
+            recordings.put(key.getBluetoothAddress(), shimmerSensors.get(key).getValues());
 
-        record = new DataRecording(category, detail, recordings, locationListener.getRecordedLocations(), startTime, new Date(), drr);
+        drr.setCategory(category);
+        drr.setDetail(detail);
+        drr.setStartTime(startTime);
+        drr.setEndTime(new Date());
+
+        record = new DataRecording(recordings, locationListener.getRecordedLocations(), drr);
 
         DataHelper.init(context);
         DataHelper.addRecord(record, true, context);
+    }
+
+    public static DataRecordingRequest getDrr(){
+        return drr;
     }
 }

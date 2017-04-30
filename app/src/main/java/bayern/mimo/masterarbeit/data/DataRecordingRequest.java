@@ -16,11 +16,20 @@ public class DataRecordingRequest {
     private String shimmer2MAC;
     private String heatMAC;
     private boolean isUploaded;
+    private String category;
+    private String detail;
+    private Date startTime;
+    private Date endTime;
 
     public DataRecordingRequest(String guid, int serverID, String username, Date timestamp,
                                 String shimmer1MAC,
                                 String shimmer2MAC,
-                                String heatMAC, boolean isUploaded) {
+                                String heatMAC,
+                                boolean isUploaded,
+                                String category,
+                                String detail,
+                                Date startTime,
+                                Date endTime) {
         this.guid = guid;
         this.serverID = serverID;
         this.username = username;
@@ -29,6 +38,10 @@ public class DataRecordingRequest {
         this.shimmer2MAC = shimmer2MAC;
         this.heatMAC = heatMAC;
         this.isUploaded = isUploaded;
+        this.category = category;
+        this.detail = detail;
+        this.startTime = startTime;
+        this.endTime = endTime;
     }
 
     public String getGuid() {
@@ -69,5 +82,37 @@ public class DataRecordingRequest {
 
     public void setUploaded(){
         this.isUploaded = true;
+    }
+
+    public String getDetail() {
+        return detail;
+    }
+
+    public void setDetail(String detail) {
+        this.detail = detail;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
     }
 }

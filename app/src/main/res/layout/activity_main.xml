@@ -79,4 +79,13 @@
             android:text="Recording Settings" />
     </LinearLayout>
 
+    <Button
+        android:text="Rumpfuschen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/buttonRumpfuschen"
+        android:layout_alignParentEnd="true" />
+
 </RelativeLayout>

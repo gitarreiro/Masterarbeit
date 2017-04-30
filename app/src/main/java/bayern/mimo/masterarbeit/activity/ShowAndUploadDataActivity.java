@@ -42,6 +42,8 @@ public class ShowAndUploadDataActivity extends AppCompatActivity {
         setContentView(R.layout.activity_show_upload_data);
 
 
+        System.out.println("ShowAndUploadActivity(): "+ DataHelper.getDataRecordings(this).size()+" DataRecordings found");
+
         this.recordingAdapter = new RecordingAdapter(this, DataHelper.getDataRecordings(this));
 
         ListView listViewData = (ListView) findViewById(R.id.listViewData);
@@ -49,7 +51,7 @@ public class ShowAndUploadDataActivity extends AppCompatActivity {
         /*listViewData.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                //TODO show dialog to upload data
+                //TODO show dialog to upload data . vllt. auch nicht
                 return false;
             }
         });*/
@@ -63,7 +65,7 @@ public class ShowAndUploadDataActivity extends AppCompatActivity {
             public void run() {
                 recordingAdapter.notifyDataSetChanged();
                 handler.postDelayed(this, 2000);
-                System.out.println("updated Recording list");
+                //System.out.println("updated Recording list");
             }
         };
 
@@ -123,16 +125,16 @@ public class ShowAndUploadDataActivity extends AppCompatActivity {
     private JSONObject createRequest(DataRecording record) {
 
 
-        List<Shimmer> shimmerSensors = new ArrayList<>(record.getShimmerValues().keySet());
+        List<String> shimmerSensors = new ArrayList<>(record.getShimmerValues().keySet());
 
         JSONObject request = new JSONObject();
         try {
             request.put("Username", "testuser");
             if (shimmerSensors.size() > 0)
-                request.put("Shimmer1MAC", shimmerSensors.get(0).getBluetoothAddress());
+                request.put("Shimmer1MAC", shimmerSensors.get(0));
 
             if (shimmerSensors.size() > 1)
-                request.put("Shimmer2MAC", shimmerSensors.get(1).getBluetoothAddress());
+                request.put("Shimmer2MAC", shimmerSensors.get(1));
 
             request.put("Category", record.getCategory());
             request.put("Detail", record.getDetail());

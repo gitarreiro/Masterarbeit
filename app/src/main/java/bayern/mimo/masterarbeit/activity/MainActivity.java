@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.View;
 import android.widget.Button;
 
 import java.text.ParseException;
@@ -14,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import bayern.mimo.masterarbeit.R;
+import bayern.mimo.masterarbeit.data.DataHelper;
 import bayern.mimo.masterarbeit.listener.OnButtonConnectSensorsClickListener;
 import bayern.mimo.masterarbeit.listener.OnButtonSettingsClickListener;
 import bayern.mimo.masterarbeit.listener.OnButtonShowUploadDataClickListener;
@@ -52,6 +54,22 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        Button buttonRumpfuschen = (Button) findViewById(R.id.buttonRumpfuschen);
+        buttonRumpfuschen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO HIER WIRD RUMGEPFUSCHT - mit Vorsicht genießen!
+                //DataHelper.dropAll(MainActivity.this);
+            }
+        });
+
+
+
+
+
+
 
 
         /*

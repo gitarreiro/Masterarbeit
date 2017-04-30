@@ -2,14 +2,10 @@ package bayern.mimo.masterarbeit.data;
 
 import android.location.Location;
 
-import com.shimmerresearch.android.Shimmer;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import bayern.mimo.masterarbeit.common.AppSensors;
 
 /**
  * Created by MiMo
@@ -17,18 +13,18 @@ import bayern.mimo.masterarbeit.common.AppSensors;
 public class DataRecording {
 
     private DataRecordingRequest drr;
-    private Map<Shimmer, List<ShimmerValue>> shimmerValues;
+    private Map<String, List<ShimmerValue>> shimmerValues;
     private Date startDate;
     private Date endDate;
-    private String category;
-    private String detail;
+    //private String category;
+    //private String detail;
 
     private List<Location> locations;
 
-    public DataRecording(String category, String detail, Map<Shimmer, List<ShimmerValue>> shimmerValues, List<Location> locations, Date startDate, Date endDate, DataRecordingRequest drr){
+    public DataRecording(Map<String, List<ShimmerValue>> shimmerValues, List<Location> locations, DataRecordingRequest drr){
         this.drr = drr;
-        this.category = category;
-        this.detail = detail;
+      //  this.category = category;
+        //this.detail = detail;
         this.shimmerValues = shimmerValues;
         this.locations = locations;
         this.startDate = startDate;
@@ -40,7 +36,7 @@ public class DataRecording {
     public String getStartDate(){
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy hh:mm");
 
-        return sdf.format(this.startDate);
+        return sdf.format(this.drr.getStartTime());
     }
 
     public int getSensorCount(){
@@ -50,14 +46,14 @@ public class DataRecording {
     }
 
     public String getCategory() {
-        return category;
+        return drr.getCategory();
     }
 
     public String getDetail() {
-        return detail;
+        return drr.getDetail();
     }
 
-    public Map<Shimmer, List<ShimmerValue>> getShimmerValues() {
+    public Map<String, List<ShimmerValue>> getShimmerValues() {
         return shimmerValues;
     }
 
