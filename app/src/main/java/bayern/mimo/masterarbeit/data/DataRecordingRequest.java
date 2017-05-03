@@ -115,4 +115,24 @@ public class DataRecordingRequest {
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
     }
+
+    public void setServerID(int serverID) {
+        this.serverID = serverID;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("GUID: ").append(guid).append("\n");
+        sb.append("Server ID: ").append(serverID).append("\n");
+        sb.append("Username: ").append(username).append("\n");
+        sb.append("Timestamp: ").append(timestamp).append("\n");
+        sb.append("Shimmer1MAC: ").append(shimmer1MAC).append("\n");
+        sb.append("Shimmer2MAC: ").append(shimmer2MAC).append("\n");
+        sb.append("HeatMAC: ").append(heatMAC).append("\n");
+        sb.append("is uploaded: ").append(isUploaded).append("\n");
+        sb.append("Category: ").append(category).append("\n");
+        sb.append("Detail: ").append(detail).append("\n");
+        return sb.toString();
+    }
 }

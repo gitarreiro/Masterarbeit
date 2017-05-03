@@ -66,7 +66,17 @@ public class AppSensors {
     public static boolean startRecording() {
         if (!isInitialized) return false; //TODO Fehlermeldung ausgeben
 
+        for(ShimmerHandler handler : shimmerSensors.values()){
+            handler.reset();
+        }
+
+        locationListener.reset();
+
         startTime = new Date();
+
+        for(Shimmer shimmer:shimmerSensors.keySet()){
+            shimmer.startStreaming();
+        }
 
         try {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
@@ -88,6 +98,7 @@ public class AppSensors {
         } catch (SecurityException e) {
             e.printStackTrace();
         }
+
     }
 
 
@@ -148,6 +159,10 @@ public class AppSensors {
         drr.setDetail(detail);
         drr.setStartTime(startTime);
         drr.setEndTime(new Date());
+
+        AppSensors.setDrr(drr);
+
+        System.out.println("AppSensors.commit(): " + shimmerSensors.get((Shimmer)shimmerSensors.keySet().toArray()[0]).getValues().size() + " ShimmerValues");
 
         record = new DataRecording(recordings, locationListener.getRecordedLocations(), drr);
 

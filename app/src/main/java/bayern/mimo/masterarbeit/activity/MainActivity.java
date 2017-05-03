@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //TODO HIER WIRD RUMGEPFUSCHT - mit Vorsicht genießen!
-                //DataHelper.dropAll(MainActivity.this);
+                DataHelper.dropAll(MainActivity.this);
             }
         });
 

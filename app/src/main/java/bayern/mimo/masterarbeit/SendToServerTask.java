@@ -1,8 +1,9 @@
 package bayern.mimo.masterarbeit;
 
+import android.content.Context;
+import android.database.DatabaseErrorHandler;
+import android.location.Location;
 import android.os.AsyncTask;
-
-import com.shimmerresearch.android.Shimmer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -15,13 +16,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
-import bayern.mimo.masterarbeit.common.AppSensors;
 import bayern.mimo.masterarbeit.data.DataHelper;
 import bayern.mimo.masterarbeit.data.DataRecording;
 import bayern.mimo.masterarbeit.data.DataRecordingRequest;
@@ -35,9 +31,11 @@ import bayern.mimo.masterarbeit.util.Config;
 public class SendToServerTask extends AsyncTask<String, Void, String> {
 
     private DataRecording record;
+    private Context context;
 
-    public SendToServerTask(DataRecording record){
+    public SendToServerTask(DataRecording record, Context context) {
         this.record = record;
+        this.context = context;
     }
 
     @Override
@@ -84,6 +82,8 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
             }
 
             urlConn.connect();
+            //TODO disconnect again?
+
 
 
         } catch (IOException | NullPointerException e) {
@@ -99,38 +99,37 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
         System.out.println("Got result: " + result);
 
 
-
-
-        if(result.startsWith("DRRID")){
+        if (result.startsWith("DRRID")) {
             System.out.println("found DRRID");
             String[] split = result.split(":");
             int drrID = -1;
             try {
                 drrID = Integer.parseInt(split[1]);
-            }catch(NumberFormatException e){
+            } catch (NumberFormatException e) {
                 e.printStackTrace();
             }
 
-            if(drrID != -1){
+            if (drrID != -1) {
                 DataHelper.setUploadCompleted(drrID);
             }
 
             return;
         }
 
-        if(result == null){
+        if (result == null) {
             System.out.println("Result is null");
             return;
         }
 
-        if(result.isEmpty()){
+        if (result.isEmpty()) {
             System.out.println("Result is empty");
             return;
         }
 
-        try{
+        try {
             JSONObject json = new JSONObject(result);
-            if(json.has("Shimmer1MAC") && json.has("Shimmer2MAC") ) { //TODO besseren case definieren. für jetzt reicht das auf alle fälle
+            if (json.has("Shimmer1MAC") && json.has("Shimmer2MAC")) { //TODO besseren case definieren. für jetzt reicht das auf alle fälle
+                /*
                 int id = json.getInt("ID");
 
                 String username = json.getString("Username");
@@ -150,34 +149,54 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
                 String heatMAC = json.getString("HeatMAC");
 
                 String guid = UUID.randomUUID().toString();
+                */
 
-                DataRecordingRequest drr = AppSensors.getDrr();
-                        //new DataRecordingRequest(guid, id, username, timestamp, shimmer1MAC, shimmer2MAC, heatMAC, true, null, null, null, null); //TODO get from DataRecording oder so
+                //DataRecordingRequest drr = AppSensors.getDrr();
+                DataRecordingRequest drr = record.getDrr();
+                drr.setServerID(json.getInt("ID"));
+                DataHelper.updateDrrServerID(drr, context);
+                //TODO schreibe ID in lokale Datenbank
+
+
                 requestSucceeded(drr);
             }
-        }catch(JSONException e){
+        } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        if (result.contains("DRRID")) {
+            //Upload completed
+            String[] res = result.split(":");
+            System.out.println("Wir haben was tolles gefunden!");
+            if (res.length == 2) {
+                System.out.println("Die Länge passt!");
+                //DRR ID auslesen
+                int drrID = Integer.parseInt(res[1].replace("\"", ""));
+                System.out.println("wir haben gelesen, und zwar die ID " + drrID);
+                DataHelper.updateDrrUploaded(drrID, context);
+            } else {
+                System.out.println("Länge ist " + res.length);
+            }
+        }
+
+        System.out.println("nachm if");
     }
 
     private void requestSucceeded(DataRecordingRequest drr) {
         System.out.println("in requestSucceeded(drr)");
 
-        AppSensors.setDrr(drr);
-
-
+        //AppSensors.setDrr(drr);
 
 
         String uploadPath = Config.SERVER_API_URL + Config.SHIMMER_UPLOAD_PATH;
 
-        //Map<Shimmer, ShimmerHandler> shimmerSensors = AppSensors.getShimmerValues();
-        JSONArray allValuesJson = new JSONArray();
+
+        JSONObject jsonToSend = new JSONObject();
 
 
-        for(String shimmerAddress : record.getShimmerValues().keySet()){
+        JSONArray shimmerValuesJson = new JSONArray();
 
-            //himmerHandler handler = shimmerSensors.get(shimmerAddress);
-            //List<ShimmerValue> values = handler.getValues();
+        for (String shimmerAddress : record.getShimmerValues().keySet()) {
 
             List<ShimmerValue> values = record.getShimmerValues().get(shimmerAddress);
 
@@ -206,10 +225,10 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
                     valueAsJson.put("REAL_TIME_CLOCK", value.getRealTimeClock());
                     valueAsJson.put("TIMESTAMP_SYNC", value.getTimestampSync());
                     valueAsJson.put("REAL_TIME_CLOCK_SYNC", value.getRealTimeClockSync());
-                    valueAsJson.put("DataRecordingRequestID", drr.getGuid());
+                    valueAsJson.put("DataRecordingRequestID", drr.getServerID());
                     valueAsJson.put("SensorMAC", shimmerAddress);
 
-                    allValuesJson.put(valueAsJson);
+                    shimmerValuesJson.put(valueAsJson);
 
                     //System.out.println(jsonValues.toString(2));
 
@@ -220,27 +239,65 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
 
             }
 
-            System.out.println("-_-_-_-_-_-_-UPLOADING-_-_-_-_-_-_-");
 
-            System.out.println("Upload path: " + uploadPath);
-            System.out.println("data: \n");
+        }
 
+        JSONArray locationValuesJson = new JSONArray();
+
+        /*
+        "LATITUDE": 1,
+		"LONGITUDE": 2,
+		"TIMESTAMP": 3,
+		"ACCURACY": 4,
+		"ALTITUDE": 5,
+		"ELAPSED_REAL_TIME_NANOS": 123,
+		"SPEED": 1000,
+		"DataRecordingRequestID": 12
+         */
+
+        for (Location location : record.getLocations()) {
+            JSONObject valueAsJson = new JSONObject();
             try {
-                System.out.println(allValuesJson.toString(2));
-            }catch (JSONException e){
+                valueAsJson.put("LATITUDE", location.getLatitude());
+                valueAsJson.put("LONGITUDE", location.getLatitude());
+                valueAsJson.put("TIMESTAMP", location.getLatitude());
+                valueAsJson.put("ACCURACY", location.getLatitude());
+                valueAsJson.put("ALTITUDE", location.getLatitude());
+                valueAsJson.put("ELAPSED_REAL_TIME_NANOS", location.getLatitude());
+                valueAsJson.put("SPEED", location.getLatitude());
+                valueAsJson.put("DataRecordingRequestID", drr.getServerID());
+
+                locationValuesJson.put(valueAsJson);
+
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
-
-
-
-            new SendToServerTask(record).execute(uploadPath, allValuesJson.toString());
-            //this.execute(uploadPath, allValuesJson.toString());
-
-
-            //System.out.println("-_-_-_-_-_-_-UPLOADING DONE-_-_-_-_-_-_-");
-
-            //TODO send
         }
+
+
+        try {
+            jsonToSend.put("ShimmerData", shimmerValuesJson);
+            jsonToSend.put("LocationData", locationValuesJson);
+
+            System.out.println("GESENDET WIRD: \n" + jsonToSend.toString(2));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("-_-_-_-_-_-_-UPLOADING-_-_-_-_-_-_-");
+
+        System.out.println("Upload path: " + uploadPath);
+        System.out.println("data: \n");
+
+        try {
+            System.out.println(shimmerValuesJson.toString(2));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+        new SendToServerTask(record, context).execute(uploadPath, shimmerValuesJson.toString());
+
 
     }
 

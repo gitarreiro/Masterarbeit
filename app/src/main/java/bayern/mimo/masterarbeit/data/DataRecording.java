@@ -73,4 +73,17 @@ public class DataRecording {
     public List<Location> getLocations() {
         return locations;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("DRR: "+drr.toString()).append("\n");
+        for(String mac:shimmerValues.keySet()){
+            sb.append("Values for sensor ").append(mac).append(":\n");
+            List<ShimmerValue> values = shimmerValues.get(mac);
+            sb.append("\t").append(values.size()).append(" ShimmerValues").append("\n");
+        }
+        sb.append("Locations: ").append(locations.size());
+        return sb.toString();
+    }
 }

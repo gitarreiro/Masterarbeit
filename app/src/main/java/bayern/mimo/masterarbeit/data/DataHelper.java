@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 import bayern.mimo.masterarbeit.util.Config;
-import bayern.mimo.masterarbeit.util.SensorIdentifier;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -66,9 +65,28 @@ public class DataHelper {
         return records;
     }
 
+    /**
+     * TODO Reload from databsae using the same instance of the list
+     *
+     * @param context
+     * @return
+     */
+    public static List<DataRecording> getDataRecordings(Context context, List<DataRecording> recordings){
+        recordings.clear();
+
+        records = new ArrayList<>();
+        records.addAll(getRecordsFromDB(context));
+
+        recordings.addAll(records);
+
+        return recordings;
+    }
+
     public static boolean addRecord(DataRecording record, boolean shouldAddToDB, Context context) {
 
         System.out.println("adding record with " + record.getSensorCount() + " sensors.");
+
+        System.out.println("Record to store is: " + record.toString());
 
         records.add(record);
         if (shouldAddToDB)
@@ -144,12 +162,12 @@ public class DataHelper {
                 shimmerValues.put("REAL_TIME_CLOCK", value.getRealTimeClock());
                 shimmerValues.put("TIMESTAMP_SYNC", value.getTimestampSync());
                 shimmerValues.put("REAL_TIME_CLOCK_SYNC", value.getRealTimeClockSync());
-                shimmerValues.put("DataRecordingRequestID", value.getDrrId());
-                shimmerValues.put("SensorMAC", value.getAccelLnX());
+                shimmerValues.put("DataRecordingRequestID", record.getDrr().getGuid());
+                shimmerValues.put("SensorMAC", shimmerMAC);
 
                 maDB.insert("ShimmerValues", null, shimmerValues);
 
-                System.out.println("should have added single ShimmerValue");
+                System.out.println("should have added single ShimmerValue, drrId = " + record.getDrr().getGuid());
                 /*
                 maDB.execSQL("INSERT INTO ShimmerValues (" +
                         "ACCEL_LN_X, ACCEL_LN_Y, ACCEL_LN_Z, ACCEL_WR_X, ACCEL_WR_Y, ACCEL_WR_Z, GYRO_X, GYRO_Y, GYRO_Z, MAG_X, MAG_Y, MAG_Z,"
@@ -233,8 +251,10 @@ public class DataHelper {
 
         Cursor cursorDRRs = maDB.rawQuery("SELECT * FROM DataRecordingRequest", null);
 
+        System.out.println("in maDB: found " + cursorDRRs.getCount() + " DRRs");
 
         List<DataRecordingRequest> drrs = new ArrayList<>();
+
 
         while (cursorDRRs.moveToNext()) {
             //TODO hole DRRS, baue DRR, füge in DRR Liste hinzu
@@ -256,10 +276,28 @@ public class DataHelper {
 
             drrs.add(drr);
 
+            System.out.println("found drr with isUploaded = " + isUploaded);
+
 
         }
 
         cursorDRRs.close();
+
+
+
+        /*
+        TEST
+         */
+
+
+//        Cursor cursorShimmerValues = maDB.rawQuery("SELECT * FROM ShimmerValues", null);
+//        System.out.println("in Table ShimmerValues: " + cursorShimmerValues.getCount() + " values");
+
+
+        /*
+        TEST ENDE
+         */
+
 
         createTableShimmerValues(maDB);
 
@@ -268,17 +306,17 @@ public class DataHelper {
 
             Map<String, List<ShimmerValue>> shimmers = new HashMap<>();
 
-            System.out.println("AKTUELL S1MAC = "+drr.getShimmer1MAC());
-            System.out.println("AKTUELL S2MAC = "+drr.getShimmer2MAC());
+            System.out.println("AKTUELL S1MAC = " + drr.getShimmer1MAC());
+            System.out.println("AKTUELL S2MAC = " + drr.getShimmer2MAC());
 
             if (drr.getShimmer1MAC() != null && !drr.getShimmer1MAC().equals("null")) {
-                System.out.println("called for S1 = '"+drr.getShimmer1MAC()+"'");
+                System.out.println("called for S1 = '" + drr.getShimmer1MAC() + "'");
                 List<ShimmerValue> shimmerValues = getShimmerValues(maDB, drr.getGuid(), drr.getShimmer1MAC());
                 shimmers.put(drr.getShimmer1MAC(), shimmerValues);
             }
 
             if (drr.getShimmer2MAC() != null && !drr.getShimmer2MAC().equals("null")) {
-                System.out.println("called for S2 = '"+drr.getShimmer2MAC()+"'");
+                System.out.println("called for S2 = '" + drr.getShimmer2MAC() + "'");
                 List<ShimmerValue> shimmerValues = getShimmerValues(maDB, drr.getGuid(), drr.getShimmer2MAC());
                 shimmers.put(drr.getShimmer2MAC(), shimmerValues);
             }
@@ -310,20 +348,54 @@ public class DataHelper {
 
     private static List<ShimmerValue> getShimmerValues(SQLiteDatabase db, String drrGuid, String sensorMAC) {
 
+        System.out.println("getShimmerValues(db, drrGuid=" + drrGuid + ", sensorMac=" + sensorMAC + ")");
+
+        Cursor test = db.rawQuery("SELECT * FROM ShimmerValues", null);
+        System.out.println("gesamte ShimmerValue-Tabelle hat 0" + test.getCount() + " Einträge.");
+        test.moveToFirst();
+        System.out.println("found Shimmer MAC:" + test.getString(test.getColumnIndex("SensorMAC")));
+        System.out.println("DRR GUID is: " + test.getString(test.getColumnIndex("DataRecordingRequestID")));
 
 
         Cursor cursorShimmerValues = db.rawQuery("SELECT * FROM ShimmerValues WHERE DataRecordingRequestID=? AND SensorMAC=?", new String[]{drrGuid, sensorMAC});
 
-        System.out.println("Shimmer Values for DRR GUID " + drrGuid + ": " + cursorShimmerValues.getCount());
+        System.out.println("Shimmer Values for DRR GUID " + drrGuid + " and SensorMAC " + sensorMAC + ": " + cursorShimmerValues.getCount());
 
         List<ShimmerValue> shimmerValues = new ArrayList<>();
         //TODO evtl. null-check
         while (cursorShimmerValues.moveToNext()) {
 
+            /*
+
+            ID INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + "ACCEL_LN_X REAL, "
+                + "ACCEL_LN_Y REAL, "
+                + "ACCEL_LN_Z REAL, "
+                + "ACCEL_WR_X REAL, "
+                + "ACCEL_WR_Y REAL, "
+                + "ACCEL_WR_Z REAL, "
+                + "GYRO_X REAL, "
+                + "GYRO_Y  REAL, "
+                + "GYRO_Z REAL, "
+                + "MAG_X REAL, "
+                + "MAG_Y REAL, MAG_Z REAL, "
+                + "TEMPERATURE REAL, "
+                + "PRESSURE REAL, "
+                + "TIMESTAMP REAL, "
+                + "REAL_TIME_CLOCK REAL, "
+                + "TIMESTAMP_SYNC REAL, "
+                + "REAL_TIME_CLOCK_SYNC REAL,"
+                + "DataRecordingRequestID VARCHAR, "
+                + "SensorMAC VARCHAR"
+
+             */
+
+
+            cursorShimmerValues.getColumnIndex("SensorMAC");
             double id = cursorShimmerValues.getDouble(0);
-            double accelLnX = cursorShimmerValues.getDouble(1);
-            double accelLnY = cursorShimmerValues.getDouble(2);
-            double accelLnZ = cursorShimmerValues.getDouble(3);
+            double accelLnX = cursorShimmerValues.getDouble(cursorShimmerValues.getColumnIndex("ACCEL_LN_X"));
+            double accelLnY = cursorShimmerValues.getDouble(cursorShimmerValues.getColumnIndex("ACCEL_LN_Y"));
+            double accelLnZ = cursorShimmerValues.getDouble(cursorShimmerValues.getColumnIndex("ACCEL_LN_Z"));
             double accelWrX = cursorShimmerValues.getDouble(4);
             double accelWrY = cursorShimmerValues.getDouble(5);
             double accelWrZ = cursorShimmerValues.getDouble(6);
@@ -354,7 +426,7 @@ public class DataHelper {
     private static List<Location> getLocations(SQLiteDatabase db, String drrGuid) {
         Cursor cursorLocations = db.rawQuery("SELECT * FROM Locations WHERE DataRecordingRequestID=?", new String[]{drrGuid});
 
-        System.out.println("Shimmer Values for DRR GUID " + drrGuid + ": " + cursorLocations.getCount());
+        System.out.println("Locations for DRR GUID " + drrGuid + ": " + cursorLocations.getCount());
 
         List<Location> locations = new ArrayList<>();
         //TODO evtl. null-check
@@ -397,6 +469,24 @@ public class DataHelper {
         cursorLocations.close();
 
         return locations;
+    }
+
+    public static void updateDrrServerID(DataRecordingRequest drr, Context context) {
+        SQLiteDatabase maDB = context.openOrCreateDatabase(Config.DB_NAME, MODE_PRIVATE, null);
+
+        createTableDRR(maDB);
+
+        maDB.execSQL("UPDATE DataRecordingRequest SET SERVERID=? WHERE GUID=?", new String[]{String.valueOf(drr.getServerID()), drr.getGuid()});
+        maDB.close();
+    }
+
+    public static void updateDrrUploaded(int drrID, Context context) {
+        SQLiteDatabase maDB = context.openOrCreateDatabase(Config.DB_NAME, MODE_PRIVATE, null);
+
+        createTableDRR(maDB);
+
+        maDB.execSQL("UPDATE DataRecordingRequest SET ISUPLOADED=1 WHERE SERVERID=?", new String[]{String.valueOf(drrID)});
+        maDB.close();
     }
 
 

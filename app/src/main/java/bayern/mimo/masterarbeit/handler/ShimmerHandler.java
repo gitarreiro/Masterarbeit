@@ -91,6 +91,7 @@ public class ShimmerHandler extends Handler {
                                                             timestampSync, realTimeClockSync, null, null);
 
                     this.values.add(value);
+                    System.out.println("added ShimmerValue");
                 }
                 break;
             case Shimmer.MESSAGE_TOAST:
@@ -102,11 +103,6 @@ public class ShimmerHandler extends Handler {
             case Shimmer.MESSAGE_STATE_CHANGE:
                 switch (msg.arg1) {
                     case Shimmer.MSG_STATE_FULLY_INITIALIZED:
-                        //if (shimmer.getShimmerState() == Shimmer.STATE_CONNECTED) {
-                        //    Log.d("ConnectionStatus", "Successful");
-                        //shimmer.startStreaming();
-                        //shimmerTimer(30); //Disconnect in 30 seconds
-                        //}
                         caller.notifyShimmerConnected();
                         Log.d("ConnectionStatus", "Might have been connected");
                         break;
@@ -139,6 +135,7 @@ public class ShimmerHandler extends Handler {
     }
 
     public List<ShimmerValue> getValues(){
+        System.out.println("returning "+this.values.size() +" ShimmerValues");
         return this.values;
     }
 

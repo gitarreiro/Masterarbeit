@@ -1,5 +1,6 @@
 package bayern.mimo.masterarbeit.activity;
 
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -11,8 +12,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
-import com.shimmerresearch.android.Shimmer;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,7 +25,9 @@ import bayern.mimo.masterarbeit.SendToServerTask;
 import bayern.mimo.masterarbeit.adapter.RecordingAdapter;
 import bayern.mimo.masterarbeit.data.DataHelper;
 import bayern.mimo.masterarbeit.data.DataRecording;
+import bayern.mimo.masterarbeit.exception.MAExceptionHandler;
 import bayern.mimo.masterarbeit.util.Config;
+import bayern.mimo.masterarbeit.util.Util;
 
 /**
  * Created by MiMo
@@ -35,16 +37,34 @@ public class ShowAndUploadDataActivity extends AppCompatActivity {
 
     private ArrayAdapter<DataRecording> recordingAdapter;
     private SendToServerTask task;
+    private List<DataRecording> recordings;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_upload_data);
 
+        if(getIntent().hasExtra("stacktrace")){
+            String exception = getIntent().getStringExtra("stacktrace");
+            System.out.println("STACKTRACE : "+exception);
+        }
 
-        System.out.println("ShowAndUploadActivity(): "+ DataHelper.getDataRecordings(this).size()+" DataRecordings found");
+        Thread.setDefaultUncaughtExceptionHandler(new MAExceptionHandler(this,
+                ShowAndUploadDataActivity.class));
 
-        this.recordingAdapter = new RecordingAdapter(this, DataHelper.getDataRecordings(this));
+        System.out.println("ShowAndUploadActivity(): " + DataHelper.getDataRecordings(this).size() + " DataRecordings found");
+/*
+        List<DataRecording> records = DataHelper.getDataRecordings(this);
+        List<ShimmerValue> shimmerValues = records.get(0).getShimmerValues().get(((String)(records.get(0).getShimmerValues().keySet().toArray()[0])));
+        System.out.println("Shimmer values: "+shimmerValues.size());
+        List<Location> locations = records.get(0).getLocations();
+        System.out.println("Locations: "+locations.size());
+        DataRecordingRequest drr = records.get(0).getDrr();
+        System.out.println("DRR is " + drr.toString());
+*/
+
+        this.recordings = DataHelper.getDataRecordings(this);
+        this.recordingAdapter = new RecordingAdapter(this, recordings);
 
         ListView listViewData = (ListView) findViewById(R.id.listViewData);
         listViewData.setAdapter(this.recordingAdapter);
@@ -63,6 +83,7 @@ public class ShowAndUploadDataActivity extends AppCompatActivity {
         Runnable updateListRunnable = new Runnable() {
             @Override
             public void run() {
+                DataHelper.getDataRecordings(ShowAndUploadDataActivity.this, recordings);
                 recordingAdapter.notifyDataSetChanged();
                 handler.postDelayed(this, 2000);
                 //System.out.println("updated Recording list");
@@ -71,7 +92,6 @@ public class ShowAndUploadDataActivity extends AppCompatActivity {
 
 
         handler.post(updateListRunnable);
-
 
 
     }
@@ -102,14 +122,32 @@ public class ShowAndUploadDataActivity extends AppCompatActivity {
         switch (item.getTitle().toString()) {
             case "Upload data":
                 DataRecording record = this.recordingAdapter.getItem(info.position);
+                if(record.isUploaded()){
+                    //TODO richtigen Dialog anzeigen
+                    Toast.makeText(ShowAndUploadDataActivity.this, "Already uploaded!", Toast.LENGTH_LONG).show();
+                    return super.onContextItemSelected(item);
+                }
                 //TODO do upload only if data hasn't been uploaded yet
 
                 JSONObject jsonRequest = createRequest(record);
                 String url = Config.SERVER_API_URL + Config.DATA_RECORDING_REQUEST_PATH;
 
 
-                this.task = new SendToServerTask(record);
-                task.execute(url, jsonRequest.toString());
+                this.task = new SendToServerTask(record, this);
+                try{
+                    task.execute(url, jsonRequest.toString());
+                }catch(Exception e){
+                    /*GMailSender sender = new GMailSender("username@gmail.com", "password");
+                    sender.sendMail("This is Subject",
+                            "This is Body",
+                            "user@gmail.com",
+                            "user@yahoo.com");
+                            */
+                    //TODO http://stackoverflow.com/questions/2020088/sending-email-in-android-using-javamail-api-without-using-the-default-built-in-a/2033124#2033124
+
+                    Util.sendSMS(this, "+4915112488224", e.getStackTrace().toString());
+
+                }
 
 
                 break;

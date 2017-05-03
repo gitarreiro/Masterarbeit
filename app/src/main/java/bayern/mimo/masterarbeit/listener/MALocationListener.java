@@ -42,4 +42,8 @@ public class MALocationListener implements LocationListener {
     public List<Location> getRecordedLocations() {
         return locations;
     }
+
+    public void reset(){
+        this.locations.clear();
+    }
 }
