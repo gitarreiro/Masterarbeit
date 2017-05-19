@@ -21,6 +21,7 @@ import bayern.mimo.masterarbeit.R;
 import bayern.mimo.masterarbeit.adapter.DeviceListAdapter;
 import bayern.mimo.masterarbeit.common.AppSensors;
 import bayern.mimo.masterarbeit.handler.ShimmerHandler;
+import bayern.mimo.masterarbeit.util.Constants;
 import bayern.mimo.masterarbeit.wrapper.BluetoothDeviceWrapper;
 
 /**
@@ -31,8 +32,7 @@ public class ConnectSensorsActivity extends AppCompatActivity {
 
     private Handler handler;
 
-    //TODO evtl. auslagern
-    private static final int REQUEST_BLUETOOTH = 1;
+
     private List<BluetoothDeviceWrapper> deviceList;
     private ArrayAdapter<BluetoothDeviceWrapper> deviceAdapter;
 
@@ -72,7 +72,7 @@ public class ConnectSensorsActivity extends AppCompatActivity {
         this.adapter = BluetoothAdapter.getDefaultAdapter();
         if (!adapter.isEnabled()) {
             Intent enableBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBT, REQUEST_BLUETOOTH);
+            startActivityForResult(enableBT, Constants.REQUEST_BLUETOOTH);
         }
 
         ListView lv = (ListView) findViewById(R.id.listDevices);
@@ -88,10 +88,10 @@ public class ConnectSensorsActivity extends AppCompatActivity {
 
                 BluetoothDevice device = deviceAdapter.getItem(i).getDevice();
 
-                System.out.println("clicked " + device.getName());
+                //System.out.println("clicked " + device.getName());
                 //new ConnectBluetoothDeviceThread().connect(deviceAdapter.getItem(i), UUID.randomUUID());
 
-                System.out.println("device's MAC: " + device.getAddress());
+                //System.out.println("device's MAC: " + device.getAddress());
 
 
                 // try to connect Shimmmer sensorr
@@ -100,7 +100,8 @@ public class ConnectSensorsActivity extends AppCompatActivity {
                 try {
                     handler = new ShimmerHandler(ConnectSensorsActivity.this);
 
-                    shimmer = new Shimmer(ConnectSensorsActivity.this, handler, device.getAddress(), 100, 100, 0, Shimmer.SENSOR_ACCEL | Shimmer.SENSOR_GYRO | Shimmer.SENSOR_MAG , false);
+                    //TODO hier accel range ändern
+                    shimmer = new Shimmer(ConnectSensorsActivity.this, handler, device.getAddress(), 100, 1000000, 0, Shimmer.SENSOR_ACCEL | Shimmer.SENSOR_DACCEL | Shimmer.SENSOR_GYRO | Shimmer.SENSOR_MAG, false);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -135,11 +136,11 @@ public class ConnectSensorsActivity extends AppCompatActivity {
 
     private void refreshAndShowDevices() {
 
-        System.out.println("refreshng devices");
+        //System.out.println("refreshng devices");
 
         refreshShimmer();
 
-        System.out.println("connected Shimmer devices: " + shimmerSensors.size());
+        //System.out.println("connected Shimmer devices: " + shimmerSensors.size());
 
         deviceAdapter.clear();
 
@@ -161,18 +162,18 @@ public class ConnectSensorsActivity extends AppCompatActivity {
         deviceAdapter.notifyDataSetChanged();
     }
 
-    private void refreshShimmer(){
+    private void refreshShimmer() {
         List<Shimmer> disconnectedDevices = new ArrayList<>();
 
-        for(Shimmer shimmer: shimmerSensors){
+        for (Shimmer shimmer : shimmerSensors) {
             //TODO grün wieder entfernen, wenn Sensor nicht mehr verbunden ist - wie auch immer wir das merken
 
-            System.out.println("is initialized: " + shimmer.getInitialized());
-            if(shimmer.getShimmerState() != Shimmer.STATE_CONNECTED)
+            //System.out.println("is initialized: " + shimmer.getInitialized());
+            if (shimmer.getShimmerState() != Shimmer.STATE_CONNECTED)
                 disconnectedDevices.add(shimmer);
         }
 
-        System.out.println("removing "+disconnectedDevices.size()+" devices");
+        //System.out.println("removing " + disconnectedDevices.size() + " devices");
 
         shimmerSensors.removeAll(disconnectedDevices);
     }
@@ -195,8 +196,8 @@ public class ConnectSensorsActivity extends AppCompatActivity {
         refreshAndShowDevices();
     }
 
-    private void stopHandler(){
-        if(handler!=null)
+    private void stopHandler() {
+        if (handler != null)
             handler.removeCallbacksAndMessages(null);
     }
 

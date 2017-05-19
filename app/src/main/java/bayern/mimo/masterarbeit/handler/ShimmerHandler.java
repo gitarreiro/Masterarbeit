@@ -44,24 +44,21 @@ public class ShimmerHandler extends Handler {
                     Double accelWrY = getValue(msg, Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_WR_Y);
                     Double accelWrZ = getValue(msg, Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_WR_Z);
 
-                    System.out.println("accelLnX: "+accelLnX);
-                    System.out.println("accelWrX: "+accelWrX);
+                    System.out.println("accelLnX: " + accelLnX);
+                    System.out.println("accelWrX: " + accelWrX);
 
 
 
-
+/*
                     ObjectCluster objectCluster =  (ObjectCluster) msg.obj;
-                    Collection<FormatCluster> accelXFormats = objectCluster.mPropertyCluster.get(Configuration.Shimmer2.ObjectClusterSensorName.ACCEL_X);  // first retrieve all the possible formats for the current sensor device
+                    Collection<FormatCluster> accelXFormats = objectCluster.mPropertyCluster.get(Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_WR);  // first retrieve all the possible formats for the current sensor device
                     FormatCluster formatCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(accelXFormats,"CAL")); // retrieve the calibrated data
                     if (formatCluster!=null){
                         Log.d("CalibratedData",objectCluster.mMyName + " AccelX: " + formatCluster.mData + " "+ formatCluster.mUnits);
                     }else{
                         System.out.println("formatCluster is null");
                     }
-
-
-
-
+*/
 
 
                     Double gyroX = getValue(msg, Configuration.Shimmer3.ObjectClusterSensorName.GYRO_X);
@@ -82,13 +79,13 @@ public class ShimmerHandler extends Handler {
                     Double timestampSync = getValue(msg, Configuration.Shimmer3.ObjectClusterSensorName.TIMESTAMP_SYNC);
                     Double realTimeClockSync = getValue(msg, Configuration.Shimmer3.ObjectClusterSensorName.REAL_TIME_CLOCK_SYNC);
 
-                    ShimmerValue value = new ShimmerValue(  accelLnX, accelLnY, accelLnZ,
-                                                            accelWrX, accelWrY, accelWrZ,
-                                                            gyroX, gyroY, gyroZ,
-                                                            magX, magY, magZ,
-                                                            temperature, pressure,
-                                                            timestamp, realTimeClock,
-                                                            timestampSync, realTimeClockSync, null, null);
+                    ShimmerValue value = new ShimmerValue(accelLnX, accelLnY, accelLnZ,
+                            accelWrX, accelWrY, accelWrZ,
+                            gyroX, gyroY, gyroZ,
+                            magX, magY, magZ,
+                            temperature, pressure,
+                            timestamp, realTimeClock,
+                            timestampSync, realTimeClockSync, null, null);
 
                     this.values.add(value);
                     System.out.println("added ShimmerValue");
@@ -130,16 +127,20 @@ public class ShimmerHandler extends Handler {
         FormatCluster formatCluster = ObjectCluster.returnFormatCluster(accelXFormats, "CAL");
         if (formatCluster != null)
             value = formatCluster.mData;
+        else {
+            if (configKey.equals(Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_WR_X))
+                System.out.println("getValue(): formatcluster is null");
+        }
 
         return value;
     }
 
-    public List<ShimmerValue> getValues(){
-        System.out.println("returning "+this.values.size() +" ShimmerValues");
+    public List<ShimmerValue> getValues() {
+        System.out.println("returning " + this.values.size() + " ShimmerValues");
         return this.values;
     }
 
-    public void reset(){
+    public void reset() {
         this.values.clear();
     }
 

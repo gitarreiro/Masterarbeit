@@ -97,6 +97,8 @@ public class DataHelper {
     private static void addRecordToDB(DataRecording record, Context context) {
         SQLiteDatabase maDB = context.openOrCreateDatabase(Config.DB_NAME, MODE_PRIVATE, null);
 
+        maDB.beginTransaction();
+
         createTableDRR(maDB);
 
         //maDB.insert(table, null, ContentValues) TODO Umbau: schönere Möglichkeit
@@ -117,26 +119,9 @@ public class DataHelper {
 
         maDB.insert("DataRecordingRequest", null, drrValues);
 
-        System.out.println("should have added DataRecordingRequest");
-
-        /*maDB.execSQL("INSERT INTO DataRecordingRequest (GUID, SERVERID, USERNAME, TIMESTAMP, SHIMMER1MAC, SHIMMER2MAC, HEATMAC, ISUPLOADED, CATEGORY, DETAIL, STARTDATE, ENDDATE)"
-                + "VALUES("
-                + "'" + record.getDrr().getGuid() + "'"
-                + "," + record.getDrr().getServerID()
-                + "," + "'"+ record.getDrr().getUsername()+ "'"
-                + "," + record.getDrr().getTimestamp().getTime()
-                + "," + "'"+ record.getDrr().getShimmer1MAC()+ "'"
-                + "," + "'"+ record.getDrr().getShimmer2MAC()+ "'"
-                + "," + "'"+ record.getDrr().getHeatMAC()+ "'"
-                + "," + "0"
-                + "," + record.getCategory()
-                + "," + record.getDetail()
-                + "," + record.getDrr().getStartTime().getTime()
-                + "," + record.getDrr().getEndTime().getTime()
-                + ");"
-        );*/
-
         createTableShimmerValues(maDB);
+
+
 
         Map<String, List<ShimmerValue>> map = record.getShimmerValues();
         for (String shimmerMAC : map.keySet()) {
@@ -167,7 +152,7 @@ public class DataHelper {
 
                 maDB.insert("ShimmerValues", null, shimmerValues);
 
-                System.out.println("should have added single ShimmerValue, drrId = " + record.getDrr().getGuid());
+                //System.out.println("should have added single ShimmerValue, drrId = " + record.getDrr().getGuid());
                 /*
                 maDB.execSQL("INSERT INTO ShimmerValues (" +
                         "ACCEL_LN_X, ACCEL_LN_Y, ACCEL_LN_Z, ACCEL_WR_X, ACCEL_WR_Y, ACCEL_WR_Z, GYRO_X, GYRO_Y, GYRO_Z, MAG_X, MAG_Y, MAG_Z,"
@@ -198,7 +183,7 @@ public class DataHelper {
             }
         }
 
-        System.out.println("should have added all ShimmerValues");
+        //System.out.println("should have added all ShimmerValues");
 
 
         createTableLocations(maDB);
@@ -217,25 +202,13 @@ public class DataHelper {
 
             maDB.insert("Locations", null, locationValues);
 
-            /*
-            maDB.execSQL(
-                    "INSERT INTO Locations (LATITUDE, LONGITUDE, TIMESTAMP, ACCURACY, ALTITUDE, ELAPSEDREALTIMENANOS, SPEED, DataRecordingRequestID)"
-                            + " VALUES (" + location.getLatitude()
-                            + "," + location.getLongitude()
-                            + "," + location.getTime()
-                            + "," + location.getAccuracy()
-                            + "," + location.getAltitude()
-                            + "," + location.getElapsedRealtimeNanos()
-                            + "," + location.getSpeed()
-                            + "," + record.getDrr().getGuid()
-                            + ");"
-            );
-*/
-            System.out.println("should have added single Location");
 
         }
 
-        System.out.println("should have added all Locations");
+        //System.out.println("should have added all Locations");
+
+        maDB.setTransactionSuccessful();
+        maDB.endTransaction();
 
         maDB.close();
 
@@ -276,7 +249,7 @@ public class DataHelper {
 
             drrs.add(drr);
 
-            System.out.println("found drr with isUploaded = " + isUploaded);
+            //System.out.println("found drr with isUploaded = " + isUploaded);
 
 
         }
@@ -306,17 +279,17 @@ public class DataHelper {
 
             Map<String, List<ShimmerValue>> shimmers = new HashMap<>();
 
-            System.out.println("AKTUELL S1MAC = " + drr.getShimmer1MAC());
-            System.out.println("AKTUELL S2MAC = " + drr.getShimmer2MAC());
+            //System.out.println("AKTUELL S1MAC = " + drr.getShimmer1MAC());
+            //System.out.println("AKTUELL S2MAC = " + drr.getShimmer2MAC());
 
             if (drr.getShimmer1MAC() != null && !drr.getShimmer1MAC().equals("null")) {
-                System.out.println("called for S1 = '" + drr.getShimmer1MAC() + "'");
+                //System.out.println("called for S1 = '" + drr.getShimmer1MAC() + "'");
                 List<ShimmerValue> shimmerValues = getShimmerValues(maDB, drr.getGuid(), drr.getShimmer1MAC());
                 shimmers.put(drr.getShimmer1MAC(), shimmerValues);
             }
 
             if (drr.getShimmer2MAC() != null && !drr.getShimmer2MAC().equals("null")) {
-                System.out.println("called for S2 = '" + drr.getShimmer2MAC() + "'");
+                //System.out.println("called for S2 = '" + drr.getShimmer2MAC() + "'");
                 List<ShimmerValue> shimmerValues = getShimmerValues(maDB, drr.getGuid(), drr.getShimmer2MAC());
                 shimmers.put(drr.getShimmer2MAC(), shimmerValues);
             }
@@ -348,18 +321,18 @@ public class DataHelper {
 
     private static List<ShimmerValue> getShimmerValues(SQLiteDatabase db, String drrGuid, String sensorMAC) {
 
-        System.out.println("getShimmerValues(db, drrGuid=" + drrGuid + ", sensorMac=" + sensorMAC + ")");
+        //System.out.println("getShimmerValues(db, drrGuid=" + drrGuid + ", sensorMac=" + sensorMAC + ")");
 
-        Cursor test = db.rawQuery("SELECT * FROM ShimmerValues", null);
-        System.out.println("gesamte ShimmerValue-Tabelle hat 0" + test.getCount() + " Einträge.");
-        test.moveToFirst();
-        System.out.println("found Shimmer MAC:" + test.getString(test.getColumnIndex("SensorMAC")));
-        System.out.println("DRR GUID is: " + test.getString(test.getColumnIndex("DataRecordingRequestID")));
+        //Cursor test = db.rawQuery("SELECT * FROM ShimmerValues", null);
+        //System.out.println("gesamte ShimmerValue-Tabelle hat 0" + test.getCount() + " Einträge.");
+        //test.moveToFirst();
+        //System.out.println("found Shimmer MAC:" + test.getString(test.getColumnIndex("SensorMAC")));
+        //System.out.println("DRR GUID is: " + test.getString(test.getColumnIndex("DataRecordingRequestID")));
 
 
         Cursor cursorShimmerValues = db.rawQuery("SELECT * FROM ShimmerValues WHERE DataRecordingRequestID=? AND SensorMAC=?", new String[]{drrGuid, sensorMAC});
 
-        System.out.println("Shimmer Values for DRR GUID " + drrGuid + " and SensorMAC " + sensorMAC + ": " + cursorShimmerValues.getCount());
+        //System.out.println("Shimmer Values for DRR GUID " + drrGuid + " and SensorMAC " + sensorMAC + ": " + cursorShimmerValues.getCount());
 
         List<ShimmerValue> shimmerValues = new ArrayList<>();
         //TODO evtl. null-check
@@ -426,7 +399,7 @@ public class DataHelper {
     private static List<Location> getLocations(SQLiteDatabase db, String drrGuid) {
         Cursor cursorLocations = db.rawQuery("SELECT * FROM Locations WHERE DataRecordingRequestID=?", new String[]{drrGuid});
 
-        System.out.println("Locations for DRR GUID " + drrGuid + ": " + cursorLocations.getCount());
+        //System.out.println("Locations for DRR GUID " + drrGuid + ": " + cursorLocations.getCount());
 
         List<Location> locations = new ArrayList<>();
         //TODO evtl. null-check

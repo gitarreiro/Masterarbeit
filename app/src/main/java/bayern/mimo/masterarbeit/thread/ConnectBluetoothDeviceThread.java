@@ -33,7 +33,7 @@ public class ConnectBluetoothDeviceThread  extends Thread{
                 return false;
             }
         }
-        System.out.println("Connected "+bTDevice.getName() + " with MAC "+ bTDevice.getBluetoothClass());
+        //System.out.println("Connected "+bTDevice.getName() + " with MAC "+ bTDevice.getBluetoothClass());
         return true;
     }
 

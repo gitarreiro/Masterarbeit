@@ -117,13 +117,13 @@ public class AppSensors {
     public static void setCategory(String category) {
         AppSensors.category = category;
 //        drr.setCategory(category);
-        System.out.println("set category = " + category);
+        //System.out.println("set category = " + category);
     }
 
     public static void setDetail(String detail) {
         AppSensors.detail = detail;
   //      drr.setDetail(detail);
-        System.out.println("set detail = " + detail);
+        //System.out.println("set detail = " + detail);
     }
 
     public static void setDrr(DataRecordingRequest drr){
@@ -131,7 +131,7 @@ public class AppSensors {
     }
 
     public static void commit(Context context) {
-        System.out.println("AppSensors.commit()");
+        //System.out.println("AppSensors.commit()");
 
 
 
@@ -162,7 +162,7 @@ public class AppSensors {
 
         AppSensors.setDrr(drr);
 
-        System.out.println("AppSensors.commit(): " + shimmerSensors.get((Shimmer)shimmerSensors.keySet().toArray()[0]).getValues().size() + " ShimmerValues");
+        //System.out.println("AppSensors.commit(): " + shimmerSensors.get((Shimmer)shimmerSensors.keySet().toArray()[0]).getValues().size() + " ShimmerValues");
 
         record = new DataRecording(recordings, locationListener.getRecordedLocations(), drr);
 

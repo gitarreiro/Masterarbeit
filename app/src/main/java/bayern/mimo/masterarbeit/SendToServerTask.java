@@ -9,10 +9,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -62,12 +66,22 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
             urlConn.setRequestProperty("Content-Type", "application/json");
             urlConn.setRequestProperty("Accept-Encoding", "gzip");
             urlConn.setRequestProperty("Accept", "application/json");
+            //urlConn.setRequestProperty("Accept", "*/*");
+            //urlConn.setRequestProperty("User-Agent","Mozilla/5.0 ( compatible ) ");
+            //urlConn.setChunkedStreamingMode(0);
 
-            printout = new DataOutputStream(urlConn.getOutputStream());
+
+
+            OutputStream os  = urlConn.getOutputStream();
+            printout = new DataOutputStream(os);
             printout.writeBytes(args[1]);
             printout.flush();
             printout.close();
+            os.close();
 
+            System.out.println("UPLOAD _ _ _ : closed all");
+            int status = urlConn.getResponseCode();
+            System.out.println("http status code is "+status);
 
             InputStream in = urlConn.getInputStream();
             InputStreamReader inputStreamReader = new InputStreamReader(in);
@@ -83,6 +97,8 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
 
             urlConn.connect();
             //TODO disconnect again?
+
+
 
 
 
@@ -157,6 +173,8 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
                 DataHelper.updateDrrServerID(drr, context);
                 //TODO schreibe ID in lokale Datenbank
 
+                System.out.println("UPLOAD _ _ _ : DRR ID received from server is " + drr.getServerID());
+
 
                 requestSucceeded(drr);
             }
@@ -182,7 +200,7 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
         System.out.println("nachm if");
     }
 
-    private void requestSucceeded(DataRecordingRequest drr) {
+    private void  requestSucceeded(DataRecordingRequest drr) {
         System.out.println("in requestSucceeded(drr)");
 
         //AppSensors.setDrr(drr);
@@ -201,6 +219,8 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
             List<ShimmerValue> values = record.getShimmerValues().get(shimmerAddress);
 
             System.out.println("Number of values is " + values.size());
+
+            System.out.println("creating " + values.size() +" for Shimmer " +shimmerAddress);
 
             //TODO JSON bauen
             for (ShimmerValue value : values) {
@@ -244,17 +264,6 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
 
         JSONArray locationValuesJson = new JSONArray();
 
-        /*
-        "LATITUDE": 1,
-		"LONGITUDE": 2,
-		"TIMESTAMP": 3,
-		"ACCURACY": 4,
-		"ALTITUDE": 5,
-		"ELAPSED_REAL_TIME_NANOS": 123,
-		"SPEED": 1000,
-		"DataRecordingRequestID": 12
-         */
-
         for (Location location : record.getLocations()) {
             JSONObject valueAsJson = new JSONObject();
             try {
@@ -279,7 +288,7 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
             jsonToSend.put("ShimmerData", shimmerValuesJson);
             jsonToSend.put("LocationData", locationValuesJson);
 
-            System.out.println("GESENDET WIRD: \n" + jsonToSend.toString(2));
+            //System.out.println("GESENDET WIRD: \n" + jsonToSend.toString(2));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -289,12 +298,13 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
         System.out.println("Upload path: " + uploadPath);
         System.out.println("data: \n");
 
+        /*
         try {
             System.out.println(shimmerValuesJson.toString(2));
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
+        */
 
         new SendToServerTask(record, context).execute(uploadPath, shimmerValuesJson.toString());
 

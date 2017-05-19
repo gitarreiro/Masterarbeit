@@ -1,6 +1,5 @@
 package bayern.mimo.masterarbeit.activity;
 
-import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -52,6 +51,8 @@ public class ShowAndUploadDataActivity extends AppCompatActivity {
         Thread.setDefaultUncaughtExceptionHandler(new MAExceptionHandler(this,
                 ShowAndUploadDataActivity.class));
 
+        //UploadService.NAMESPACE = BuildConfig.APPLICATION_ID;
+
         System.out.println("ShowAndUploadActivity(): " + DataHelper.getDataRecordings(this).size() + " DataRecordings found");
 /*
         List<DataRecording> records = DataHelper.getDataRecordings(this);
@@ -91,7 +92,7 @@ public class ShowAndUploadDataActivity extends AppCompatActivity {
         };
 
 
-        handler.post(updateListRunnable);
+        //handler.post(updateListRunnable);
 
 
     }
