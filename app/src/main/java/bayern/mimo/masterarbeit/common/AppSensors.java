@@ -1,6 +1,7 @@
 package bayern.mimo.masterarbeit.common;
 
 import android.content.Context;
+import android.location.Criteria;
 import android.location.LocationManager;
 
 import com.shimmerresearch.android.Shimmer;
@@ -47,6 +48,15 @@ public class AppSensors {
         locationListener = new MALocationListener();
         locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
+        Criteria criteria = new Criteria();
+
+        String provider = locationManager.getBestProvider(criteria, false);
+
+        boolean enabled = locationManager
+                .isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+        System.out.println("is GPS enabled? "+ (enabled ? "ja" : "nein"));
+
         isInitialized = true;
     }
 
@@ -80,6 +90,7 @@ public class AppSensors {
 
         try {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
         } catch (SecurityException e) {
             e.printStackTrace();
         }

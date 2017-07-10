@@ -3,9 +3,12 @@ package bayern.mimo.masterarbeit.listener;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import bayern.mimo.masterarbeit.view.MADialog;
 
 /**
  * Created by MiMo on 17.04.2017.
@@ -21,7 +24,17 @@ public class MALocationListener implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
-        if(location != null) locations.add(location);
+        //if(location != null) locations.add(location);
+
+        //System.out.println("onLocationChanged()");
+
+        if(location != null){
+            locations.add(location);
+          //  System.out.println("Location gefunden!");
+        }else{
+            //System.out.println("location is null");
+        }
+
     }
 
     @Override

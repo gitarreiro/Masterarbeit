@@ -227,26 +227,26 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
                 if (value.getTimestamp() == null) continue;
                 JSONObject valueAsJson = new JSONObject();
                 try {
-                    valueAsJson.put("ACCEL_LN_X", value.getAccelLnX());
-                    valueAsJson.put("ACCEL_LN_Y", value.getAccelLnY());
-                    valueAsJson.put("ACCEL_LN_Z", value.getAccelLnZ());
-                    valueAsJson.put("ACCEL_WR_X", value.getAccelWrX());
-                    valueAsJson.put("ACCEL_WR_Y", value.getAccelWrY());
-                    valueAsJson.put("ACCEL_WR_Z", value.getAccelWrZ());
-                    valueAsJson.put("GYRO_X", value.getGyroX());
-                    valueAsJson.put("GYRO_Y", value.getGyroY());
-                    valueAsJson.put("GYRO_Z", value.getGyroZ());
-                    valueAsJson.put("MAG_X", value.getMagX());
-                    valueAsJson.put("MAG_Y", value.getMagY());
-                    valueAsJson.put("MAG_Z", value.getMagZ());
-                    valueAsJson.put("TEMPERATURE", value.getTemperature());
-                    valueAsJson.put("PRESSURE", value.getPressure());
-                    valueAsJson.put("TIMESTAMP", value.getTimestamp());
-                    valueAsJson.put("REAL_TIME_CLOCK", value.getRealTimeClock());
-                    valueAsJson.put("TIMESTAMP_SYNC", value.getTimestampSync());
-                    valueAsJson.put("REAL_TIME_CLOCK_SYNC", value.getRealTimeClockSync());
-                    valueAsJson.put("DataRecordingRequestID", drr.getServerID());
-                    valueAsJson.put("SensorMAC", shimmerAddress);
+                    valueAsJson.put("ALX", value.getAccelLnX());
+                    valueAsJson.put("ALY", value.getAccelLnY());
+                    valueAsJson.put("ALZ", value.getAccelLnZ());
+                    valueAsJson.put("AWX", value.getAccelWrX());
+                    valueAsJson.put("AWY", value.getAccelWrY());
+                    valueAsJson.put("AWZ", value.getAccelWrZ());
+                    valueAsJson.put("GX", value.getGyroX());
+                    valueAsJson.put("GY", value.getGyroY());
+                    valueAsJson.put("GZ", value.getGyroZ());
+                    valueAsJson.put("MX", value.getMagX());
+                    valueAsJson.put("MY", value.getMagY());
+                    valueAsJson.put("MZ", value.getMagZ());
+                    valueAsJson.put("TEMP", value.getTemperature());
+                    valueAsJson.put("PRS", value.getPressure());
+                    valueAsJson.put("TS", value.getTimestamp());
+                    valueAsJson.put("RTC", value.getRealTimeClock());
+                    valueAsJson.put("TSS", value.getTimestampSync());
+                    valueAsJson.put("RTCS", value.getRealTimeClockSync());
+                    valueAsJson.put("DRRID", drr.getServerID());
+                    valueAsJson.put("SMAC", shimmerAddress);
 
                     shimmerValuesJson.put(valueAsJson);
 

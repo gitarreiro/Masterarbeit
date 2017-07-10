@@ -1,21 +1,43 @@
 package bayern.mimo.masterarbeit.activity;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.widget.Button;
 
+import net.gotev.uploadservice.BuildConfig;
+import net.gotev.uploadservice.Logger;
+import net.gotev.uploadservice.MultipartUploadRequest;
+import net.gotev.uploadservice.ServerResponse;
+import net.gotev.uploadservice.UploadInfo;
+import net.gotev.uploadservice.UploadNotificationConfig;
+import net.gotev.uploadservice.UploadService;
+import net.gotev.uploadservice.UploadStatusDelegate;
+import net.gotev.uploadservice.okhttp.OkHttpStack;
+
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Random;
 
 import bayern.mimo.masterarbeit.R;
 import bayern.mimo.masterarbeit.data.DataHelper;
+import bayern.mimo.masterarbeit.data.ShimmerValue;
 import bayern.mimo.masterarbeit.listener.OnButtonConnectSensorsClickListener;
 import bayern.mimo.masterarbeit.listener.OnButtonSettingsClickListener;
 import bayern.mimo.masterarbeit.listener.OnButtonShowUploadDataClickListener;
@@ -65,7 +87,145 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        UploadService.NAMESPACE = BuildConfig.APPLICATION_ID;
+        UploadService.HTTP_STACK = new OkHttpStack();
 
+        Logger.setLogLevel(Logger.LogLevel.DEBUG);
+
+
+        Button buttonTestUploadService = (Button) findViewById(R.id.buttonTestUploadService);
+        buttonTestUploadService.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                ShimmerValue testValue = new ShimmerValue(1.0d,
+                        2.0d, 3.0d, 4.0d, 5.0d, 6.0d, 7.0d, 8.0d,
+                        9.0d, 10.0d, 11.0d, 12.0d, 13.0d, 14.0d,
+                        15.0d, 16.0d, 17.0d, 18.0d, 100,
+                        "just another MAC");
+
+
+                //List<Byte> byteList = new ArrayList<>();
+
+
+
+
+                byte[] bytes = new byte[8];
+
+
+                ByteBuffer buffer = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN);
+
+                byte[] sensorMacAsBytes = testValue.getShimmerMac().getBytes();
+
+
+                buffer.putInt(sensorMacAsBytes.length);
+
+                buffer.put(sensorMacAsBytes);
+
+
+
+                buffer.putDouble(testValue.getAccelLnX());
+                buffer.putDouble(testValue.getAccelLnY());
+                buffer.putDouble(testValue.getAccelLnZ());
+                buffer.putDouble(testValue.getAccelWrX());
+                buffer.putDouble(testValue.getAccelWrY());
+                buffer.putDouble(testValue.getAccelWrZ());
+                buffer.putDouble(testValue.getGyroX());
+                buffer.putDouble(testValue.getGyroY());
+                buffer.putDouble(testValue.getGyroZ());
+                buffer.putDouble(testValue.getMagX());
+                buffer.putDouble(testValue.getMagY());
+                buffer.putDouble(testValue.getMagZ());
+                buffer.putDouble(testValue.getTemperature());
+                buffer.putDouble(testValue.getPressure());
+                buffer.putDouble(testValue.getTimestamp());
+                buffer.putDouble(testValue.getRealTimeClock());
+                buffer.putDouble(testValue.getTimestampSync());
+                buffer.putDouble(testValue.getRealTimeClockSync());
+                buffer.putDouble(testValue.getDrrId());
+                ;
+
+                bytes = buffer.array();
+                //bytes = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).putDouble(3.1415).array();
+
+                //bytes = Util.reverse(bytes);
+
+
+                System.out.println("converted is ");
+
+                for (Byte b : bytes)
+                    System.out.println("\t" + String.format("%02x", b));
+
+
+                String path = getCacheDir() + "/ma/tmp/";
+                File pathFile = new File(path);
+
+
+                System.out.println("cache dir path: " + path);
+
+                if (!pathFile.exists())
+                    pathFile.mkdirs();
+
+
+                final File theFile = new File(pathFile + "shimmer");
+                if (theFile.exists()) {
+                    theFile.delete();
+                    System.out.println("file got deleted");
+                }
+
+
+                try {
+                    theFile.createNewFile();
+                    BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(theFile, false));
+                    bos.write(bytes);
+                    //bos.write
+                    bos.flush();
+                    bos.close();
+
+                    try {
+                        String uploadId =
+                                new MultipartUploadRequest(MainActivity.this, "http://37.221.199.137:8085/api/upload/Test")
+                                        // starting from 3.1+, you can also use content:// URI string instead of absolute file
+                                        .addFileToUpload(theFile.getAbsolutePath(), "shimmer")
+                                        .setNotificationConfig(new UploadNotificationConfig())
+                                        .setMaxRetries(2)
+                                        .setDelegate(new UploadStatusDelegate() {
+                                            @Override
+                                            public void onProgress(Context context, UploadInfo uploadInfo) {
+                                                // your code here
+                                            }
+
+                                            @Override
+                                            public void onError(Context context, UploadInfo uploadInfo, Exception exception) {
+                                                // your code here
+                                            }
+
+                                            @Override
+                                            public void onCompleted(Context context, UploadInfo uploadInfo, ServerResponse serverResponse) {
+                                                // your code here
+                                                // if you have mapped your server response to a POJO, you can easily get it:
+                                                // YourClass obj = new Gson().fromJson(serverResponse.getBodyAsString(), YourClass.class);
+                                                theFile.delete();
+                                                System.out.println("finished upload - file should be deleted");
+                                            }
+
+                                            @Override
+                                            public void onCancelled(Context context, UploadInfo uploadInfo) {
+                                                // your code here
+                                            }
+                                        })
+                                        .startUpload();
+                    } catch (Exception e) {
+                        Log.e("AndroidUploadService", e.getMessage(), e);
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
 
 
 
@@ -88,23 +248,18 @@ public class MainActivity extends AppCompatActivity {
             SimpleDateFormat format =
                     new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
             timestamp = format.parse(datestring);
-        }
-        catch(ParseException pe) {
+        } catch (ParseException pe) {
             pe.printStackTrace();
         }
 
 
-        System.out.println("Timestamp: "+timestamp);
+        System.out.println("Timestamp: " + timestamp);
 
 
 
         /*
         -----------------------------------------------------------------------------------------------------------------------------
          */
-
-
-
-
 
 
         String[] permissions = new String[6];

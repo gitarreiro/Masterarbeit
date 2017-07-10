@@ -13,6 +13,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import net.gotev.uploadservice.BuildConfig;
+import net.gotev.uploadservice.UploadService;
+import net.gotev.uploadservice.okhttp.OkHttpStack;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -52,6 +56,8 @@ public class ShowAndUploadDataActivity extends AppCompatActivity {
                 ShowAndUploadDataActivity.class));
 
         //UploadService.NAMESPACE = BuildConfig.APPLICATION_ID;
+        UploadService.NAMESPACE = BuildConfig.APPLICATION_ID;
+        UploadService.HTTP_STACK = new OkHttpStack();
 
         System.out.println("ShowAndUploadActivity(): " + DataHelper.getDataRecordings(this).size() + " DataRecordings found");
 /*

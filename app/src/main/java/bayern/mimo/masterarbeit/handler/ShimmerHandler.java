@@ -44,8 +44,8 @@ public class ShimmerHandler extends Handler {
                     Double accelWrY = getValue(msg, Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_WR_Y);
                     Double accelWrZ = getValue(msg, Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_WR_Z);
 
-                    System.out.println("accelLnX: " + accelLnX);
-                    System.out.println("accelWrX: " + accelWrX);
+                    //System.out.println("accelLnX: " + accelLnX);
+                    //System.out.println("accelWrX: " + accelWrX);
 
 
 
@@ -88,7 +88,7 @@ public class ShimmerHandler extends Handler {
                             timestampSync, realTimeClockSync, null, null);
 
                     this.values.add(value);
-                    System.out.println("added ShimmerValue");
+                    //System.out.println("added ShimmerValue");
                 }
                 break;
             case Shimmer.MESSAGE_TOAST:

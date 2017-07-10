@@ -1,6 +1,5 @@
 package bayern.mimo.masterarbeit.util;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
@@ -33,22 +32,21 @@ public class Util {
 
         //TODO get this properly to work
 
-        if(permissions == null)
+        if (permissions == null)
             permissions = new HashMap<>();
 
         for (int i = 0; i < perms.length; i++) {
             permissions.put(i, perms[i]);
             requestPermission(perms[i], i, activity);
-            System.out.println("requested for "+perms[i]);
+            System.out.println("requested for " + perms[i]);
         }
 
         //requestPermission(perms[0], 0, activity);
 
 
-
     }
 
-    public static AlertDialog showInfoDialog(String title, String message, Context context){
+    public static AlertDialog showInfoDialog(String title, String message, Context context) {
         return new AlertDialog.Builder(context)
                 .setTitle(title)
                 .setMessage(message)
@@ -62,7 +60,7 @@ public class Util {
                 .show();
     }
 
-    public static AlertDialog showDecisionDialog(String title, String message, Context context){
+    public static AlertDialog showDecisionDialog(String title, String message, Context context) {
         return new AlertDialog.Builder(context)
                 .setTitle(title)
                 .setMessage(message)
@@ -83,7 +81,6 @@ public class Util {
     private static void requestPermission(String permission, int requestCode, Activity activity) {
 
 
-
         if (ContextCompat.checkSelfPermission(activity,
                 permission)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -91,14 +88,13 @@ public class Util {
             ActivityCompat.requestPermissions(activity,
                     new String[]{permission},
                     requestCode);
-            System.out.println("Requested permission for "+permission);
-        }else{
+            System.out.println("Requested permission for " + permission);
+        } else {
             System.out.println("permission already granted for " + permission);
         }
     }
 
-    public static void sendSMS(final Context context, String phoneNumber, String message)
-    {
+    public static void sendSMS(final Context context, String phoneNumber, String message) {
         String SENT = "SMS_SENT";
         String DELIVERED = "SMS_DELIVERED";
 
@@ -109,11 +105,10 @@ public class Util {
                 new Intent(DELIVERED), 0);
 
         //---when the SMS has been sent---
-        context.registerReceiver(new BroadcastReceiver(){
+        context.registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context arg0, Intent arg1) {
-                switch (getResultCode())
-                {
+                switch (getResultCode()) {
                     case Activity.RESULT_OK:
                         Toast.makeText(context, "SMS sent",
                                 Toast.LENGTH_SHORT).show();
@@ -139,11 +134,10 @@ public class Util {
         }, new IntentFilter(SENT));
 
         //---when the SMS has been delivered---
-        context.registerReceiver(new BroadcastReceiver(){
+        context.registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context arg0, Intent arg1) {
-                switch (getResultCode())
-                {
+                switch (getResultCode()) {
                     case Activity.RESULT_OK:
                         Toast.makeText(context, "SMS delivered",
                                 Toast.LENGTH_SHORT).show();
@@ -158,6 +152,14 @@ public class Util {
 
         SmsManager sms = SmsManager.getDefault();
         sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI);
+    }
+
+    public static byte[] reverse(byte[] src) {
+        byte[] rev = new byte[src.length];
+        for (int i = 0; i < src.length; i++)
+            rev[rev.length - 1 - i] = src[i];
+
+        return rev;
     }
 
 
