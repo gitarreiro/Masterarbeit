@@ -419,7 +419,6 @@ public class DataHelper {
         System.out.println("starting finding locations........");
         while (cursorLocations.moveToNext()) {
 
-            System.out.println("found Location in db");
             int id = cursorLocations.getInt(0);
             double latitude = cursorLocations.getDouble(1);
             double longitude = cursorLocations.getDouble(2);

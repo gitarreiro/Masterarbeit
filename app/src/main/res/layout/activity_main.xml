@@ -55,11 +55,11 @@
             android:text="Show/upload data" />
 
         <Button
-            android:id="@+id/buttonPlaceholder"
+            android:id="@+id/buttonBackupRestore"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Placeholder" />
+            android:text="Backup/Restore Data" />
     </LinearLayout>
 
 

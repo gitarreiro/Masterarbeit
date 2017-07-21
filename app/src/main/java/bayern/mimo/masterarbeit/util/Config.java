@@ -12,6 +12,8 @@ public class Config {
 
     public static final String SHIMMER_UPLOAD_PATH = "/upload/ShimmerData";
 
+    public static final String UPLOAD_PATH = "/upload/FileUpload";
+
     public static final String DB_NAME = "maDbAndroid";
 
     private Config(){}

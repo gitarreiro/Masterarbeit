@@ -1,25 +1,30 @@
 package bayern.mimo.masterarbeit;
 
 import android.content.Context;
-import android.database.DatabaseErrorHandler;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.util.Log;
 
-import org.json.JSONArray;
+import net.gotev.uploadservice.*;
+import net.gotev.uploadservice.okhttp.OkHttpStack;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedOutputStream;
-import java.io.BufferedWriter;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.ArrayList;
 import java.util.List;
 
 import bayern.mimo.masterarbeit.data.DataHelper;
@@ -71,8 +76,7 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
             //urlConn.setChunkedStreamingMode(0);
 
 
-
-            OutputStream os  = urlConn.getOutputStream();
+            OutputStream os = urlConn.getOutputStream();
             printout = new DataOutputStream(os);
             printout.writeBytes(args[1]);
             printout.flush();
@@ -81,7 +85,7 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
 
             System.out.println("UPLOAD _ _ _ : closed all");
             int status = urlConn.getResponseCode();
-            System.out.println("http status code is "+status);
+            System.out.println("http status code is " + status);
 
             InputStream in = urlConn.getInputStream();
             InputStreamReader inputStreamReader = new InputStreamReader(in);
@@ -97,9 +101,6 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
 
             urlConn.connect();
             //TODO disconnect again?
-
-
-
 
 
         } catch (IOException | NullPointerException e) {
@@ -169,7 +170,7 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
 
                 //DataRecordingRequest drr = AppSensors.getDrr();
                 DataRecordingRequest drr = record.getDrr();
-                drr.setServerID(json.getInt("ID"));
+                drr.setServerID(json.getInt("ID"));//TODO crashsicher
                 DataHelper.updateDrrServerID(drr, context);
                 //TODO schreibe ID in lokale Datenbank
 
@@ -200,14 +201,200 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
         System.out.println("nachm if");
     }
 
-    private void  requestSucceeded(DataRecordingRequest drr) {
+    private void requestSucceeded(DataRecordingRequest drr) {
         System.out.println("in requestSucceeded(drr)");
 
         //AppSensors.setDrr(drr);
 
+        List<String> fileNames = new ArrayList<>();
 
-        String uploadPath = Config.SERVER_API_URL + Config.SHIMMER_UPLOAD_PATH;
+        int i = 0;
 
+        String path = context.getCacheDir() + "/ma/tmp/";
+        File pathFile = new File(path);
+
+        System.out.println("cache dir path: " + path);
+
+        if (!pathFile.exists())
+            pathFile.mkdirs();
+
+        for (String shimmerAddress : record.getShimmerValues().keySet()) {
+
+            i++;
+
+            List<ShimmerValue> values = record.getShimmerValues().get(shimmerAddress);
+
+            System.out.println("packing " + values.size() + " values");
+
+            byte[] sensorMacAsBytes = shimmerAddress.getBytes();
+
+            byte[] shimmerBytes = new byte[8 + sensorMacAsBytes.length + values.size() * 144];
+            ByteBuffer shimmerBuffer = ByteBuffer.wrap(shimmerBytes).order(ByteOrder.LITTLE_ENDIAN);
+
+
+            shimmerBuffer.putInt(sensorMacAsBytes.length);
+            shimmerBuffer.put(sensorMacAsBytes);
+
+            shimmerBuffer.putInt(drr.getServerID());
+
+            for (ShimmerValue value : values) {
+                shimmerBuffer.putDouble(value.getAccelLnX());
+                shimmerBuffer.putDouble(value.getAccelLnY());
+                shimmerBuffer.putDouble(value.getAccelLnZ());
+                shimmerBuffer.putDouble(value.getAccelWrX());
+                shimmerBuffer.putDouble(value.getAccelWrY());
+                shimmerBuffer.putDouble(value.getAccelWrZ());
+                shimmerBuffer.putDouble(value.getGyroX());
+                shimmerBuffer.putDouble(value.getGyroY());
+                shimmerBuffer.putDouble(value.getGyroZ());
+                shimmerBuffer.putDouble(value.getMagX());
+                shimmerBuffer.putDouble(value.getMagY());
+                shimmerBuffer.putDouble(value.getMagZ());
+                shimmerBuffer.putDouble(value.getTemperature());
+                shimmerBuffer.putDouble(value.getPressure());
+                shimmerBuffer.putDouble(value.getTimestamp());
+                shimmerBuffer.putDouble(value.getRealTimeClock());
+                shimmerBuffer.putDouble(value.getTimestampSync());
+                shimmerBuffer.putDouble(value.getRealTimeClockSync());
+            }
+
+            shimmerBytes = shimmerBuffer.array();
+
+
+            File theShimmerFile = new File(pathFile.getAbsolutePath() + "shimmer_" + i);
+            if (theShimmerFile.exists()) {
+                theShimmerFile.delete();
+                System.out.println("shimmer file got deleted");
+            }
+
+            try {
+
+                theShimmerFile.createNewFile();
+                BufferedOutputStream bosShimmer = new BufferedOutputStream(new FileOutputStream(theShimmerFile, false));
+                bosShimmer.write(shimmerBytes);
+                bosShimmer.flush();
+                bosShimmer.close();
+
+                fileNames.add(theShimmerFile.getAbsolutePath());
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        byte[] locationBytes = new byte[4 + record.getLocations().size() * 56];
+
+        ByteBuffer locationBuffer = ByteBuffer.wrap(locationBytes).order(ByteOrder.LITTLE_ENDIAN);
+
+        locationBuffer.putInt(drr.getServerID());
+
+        for (Location location : record.getLocations()) {
+
+            locationBuffer.putDouble(location.getLatitude());
+            locationBuffer.putDouble(location.getLongitude());
+            locationBuffer.putLong(location.getTime());
+            locationBuffer.putDouble(location.getAccuracy());
+            locationBuffer.putDouble(location.getAltitude());
+            locationBuffer.putLong(location.getElapsedRealtimeNanos());
+            locationBuffer.putDouble(location.getSpeed());
+
+        }
+
+        locationBytes = locationBuffer.array();
+
+        File locationFile = new File(pathFile.getAbsolutePath() + "location_" + System.currentTimeMillis());
+        if (locationFile.exists()) {
+            locationFile.delete();
+            System.out.println("location file got deleted");
+        }
+
+        try {
+
+            locationFile.createNewFile();
+            BufferedOutputStream bosLocation = new BufferedOutputStream(new FileOutputStream(locationFile, false));
+            bosLocation.write(locationBytes);
+            bosLocation.flush();
+            bosLocation.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        String uploadPath = Config.SERVER_API_URL + Config.UPLOAD_PATH;
+
+        UploadService.NAMESPACE = net.gotev.uploadservice.BuildConfig.APPLICATION_ID;
+        UploadService.HTTP_STACK = new OkHttpStack();
+
+
+        try {
+
+
+
+
+            MultipartUploadRequest request = new MultipartUploadRequest(context, uploadPath);
+            // starting from 3.1+, you can also use content:// URI string instead of absolute file
+            //.addFileToUpload(theShimmerFile.getAbsolutePath(), "shimmer")
+            //.addFileToUpload(locationFile.getAbsolutePath(), "location")
+
+
+            request.setNotificationConfig(new UploadNotificationConfig()); //TODO UploadNotificationConfig anpassen für besseres "Aussehen"
+            request.setMaxRetries(2);
+            request.setDelegate(new UploadStatusDelegate() {
+                @Override
+                public void onProgress(Context context, UploadInfo uploadInfo) {
+                    // your code here
+                }
+
+                @Override
+                public void onError(Context context, UploadInfo uploadInfo, Exception exception) {
+                    // your code here
+                    exception.printStackTrace();
+                }
+
+                @Override
+                public void onCompleted(Context context, UploadInfo uploadInfo, ServerResponse serverResponse) {
+                    // your code here
+                    // if you have mapped your server response to a POJO, you can easily get it:
+                    // YourClass obj = new Gson().fromJson(serverResponse.getBodyAsString(), YourClass.class);
+                    System.out.println("finished upload - file should be deleted");
+                }
+
+                @Override
+                public void onCancelled(Context context, UploadInfo uploadInfo) {
+                    // your code here
+                }
+            });
+
+
+            i = 0;
+            for (String fileName : fileNames) {
+                i++;
+                request.addFileToUpload(fileName, "shimmer" + i);
+            }
+
+            request.addFileToUpload(locationFile.getAbsolutePath(), "location");
+
+            String uploadId = request.startUpload();
+
+
+        } catch (Exception e) {
+            Log.e("AndroidUploadService", e.getMessage(), e);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+        /*
 
         JSONObject jsonToSend = new JSONObject();
 
@@ -218,9 +405,9 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
 
             List<ShimmerValue> values = record.getShimmerValues().get(shimmerAddress);
 
-            System.out.println("Number of values is " + values.size());
+            //System.out.println("Number of values is " + values.size());
 
-            System.out.println("creating " + values.size() +" for Shimmer " +shimmerAddress);
+            System.out.println("creating " + values.size() + " for Shimmer " + shimmerAddress);
 
             //TODO JSON bauen
             for (ShimmerValue value : values) {
@@ -268,12 +455,12 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
             JSONObject valueAsJson = new JSONObject();
             try {
                 valueAsJson.put("LATITUDE", location.getLatitude());
-                valueAsJson.put("LONGITUDE", location.getLatitude());
-                valueAsJson.put("TIMESTAMP", location.getLatitude());
-                valueAsJson.put("ACCURACY", location.getLatitude());
-                valueAsJson.put("ALTITUDE", location.getLatitude());
-                valueAsJson.put("ELAPSED_REAL_TIME_NANOS", location.getLatitude());
-                valueAsJson.put("SPEED", location.getLatitude());
+                valueAsJson.put("LONGITUDE", location.getLongitude());
+                valueAsJson.put("TIMESTAMP", location.getTime());
+                valueAsJson.put("ACCURACY", location.getAccuracy());
+                valueAsJson.put("ALTITUDE", location.getAltitude());
+                valueAsJson.put("ELAPSED_REAL_TIME_NANOS", location.getElapsedRealtimeNanos());
+                valueAsJson.put("SPEED", location.getSpeed());
                 valueAsJson.put("DataRecordingRequestID", drr.getServerID());
 
                 locationValuesJson.put(valueAsJson);
@@ -305,9 +492,10 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
             e.printStackTrace();
         }
         */
-
+/*
         new SendToServerTask(record, context).execute(uploadPath, shimmerValuesJson.toString());
 
+        */
 
     }
 

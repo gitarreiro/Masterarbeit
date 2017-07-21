@@ -2,8 +2,12 @@ package bayern.mimo.masterarbeit.activity;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -32,12 +36,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.Random;
 
 import bayern.mimo.masterarbeit.R;
 import bayern.mimo.masterarbeit.data.DataHelper;
 import bayern.mimo.masterarbeit.data.ShimmerValue;
+import bayern.mimo.masterarbeit.listener.OnButtonBackupDataClickListener;
 import bayern.mimo.masterarbeit.listener.OnButtonConnectSensorsClickListener;
 import bayern.mimo.masterarbeit.listener.OnButtonSettingsClickListener;
 import bayern.mimo.masterarbeit.listener.OnButtonShowUploadDataClickListener;
@@ -99,67 +102,124 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
 
-                ShimmerValue testValue = new ShimmerValue(1.0d,
+                ShimmerValue testValueShimmer = new ShimmerValue(1.0d,
                         2.0d, 3.0d, 4.0d, 5.0d, 6.0d, 7.0d, 8.0d,
                         9.0d, 10.0d, 11.0d, 12.0d, 13.0d, 14.0d,
-                        15.0d, 16.0d, 17.0d, 18.0d, 100,
+                        15.0d, 16.0d, 17.0d, 18.0d, 1076,
+                        "just a MAC");
+
+                ShimmerValue testValueShimmer2 = new ShimmerValue(111.0d,
+                        112.0d, 113.0d, 114.0d, 115.0d, 116.0d, 117.0d, 118.0d,
+                        119.0d, 1110.0d, 1111.0d, 1112.0d, 1113.0d, 1114.0d,
+                        1115.0d, 1116.0d, 1117.0d, 1118.0d, 1076,
                         "just another MAC");
 
+                Location testValueLocation = new Location("dummy");
+                testValueLocation.setLatitude(1);
+                testValueLocation.setLongitude(2);
+                testValueLocation.setTime(3);
+                testValueLocation.setAccuracy(4);
+                testValueLocation.setAltitude(5);
+                testValueLocation.setElapsedRealtimeNanos(6);
+                testValueLocation.setSpeed(7);
+
+                Location testValueLocation2 = new Location("dummy");
+                testValueLocation2.setLatitude(111);
+                testValueLocation2.setLongitude(112);
+                testValueLocation2.setTime(113);
+                testValueLocation2.setAccuracy(114);
+                testValueLocation2.setAltitude(115);
+                testValueLocation2.setElapsedRealtimeNanos(116);
+                testValueLocation2.setSpeed(117);
 
                 //List<Byte> byteList = new ArrayList<>();
 
 
+                byte[] locationBytes = new byte[4 + 2 * 56];
 
 
-                byte[] bytes = new byte[8];
+                byte[] sensorMacAsBytes = testValueShimmer.getShimmerMac().getBytes();
+
+                byte[] shimmerBytes = new byte[8 + sensorMacAsBytes.length + 2 * 144];
+                ByteBuffer shimmerBuffer = ByteBuffer.wrap(shimmerBytes).order(ByteOrder.LITTLE_ENDIAN);
 
 
-                ByteBuffer buffer = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN);
+                shimmerBuffer.putInt(sensorMacAsBytes.length);
+                shimmerBuffer.put(sensorMacAsBytes);
 
-                byte[] sensorMacAsBytes = testValue.getShimmerMac().getBytes();
+                shimmerBuffer.putInt(testValueShimmer.getDrrId());
+
+                //TODO hier schleife
+
+                shimmerBuffer.putDouble(testValueShimmer.getAccelLnX());
+                shimmerBuffer.putDouble(testValueShimmer.getAccelLnY());
+                shimmerBuffer.putDouble(testValueShimmer.getAccelLnZ());
+                shimmerBuffer.putDouble(testValueShimmer.getAccelWrX());
+                shimmerBuffer.putDouble(testValueShimmer.getAccelWrY());
+                shimmerBuffer.putDouble(testValueShimmer.getAccelWrZ());
+                shimmerBuffer.putDouble(testValueShimmer.getGyroX());
+                shimmerBuffer.putDouble(testValueShimmer.getGyroY());
+                shimmerBuffer.putDouble(testValueShimmer.getGyroZ());
+                shimmerBuffer.putDouble(testValueShimmer.getMagX());
+                shimmerBuffer.putDouble(testValueShimmer.getMagY());
+                shimmerBuffer.putDouble(testValueShimmer.getMagZ());
+                shimmerBuffer.putDouble(testValueShimmer.getTemperature());
+                shimmerBuffer.putDouble(testValueShimmer.getPressure());
+                shimmerBuffer.putDouble(testValueShimmer.getTimestamp());
+                shimmerBuffer.putDouble(testValueShimmer.getRealTimeClock());
+                shimmerBuffer.putDouble(testValueShimmer.getTimestampSync());
+                shimmerBuffer.putDouble(testValueShimmer.getRealTimeClockSync());
+
+                shimmerBuffer.putDouble(testValueShimmer2.getAccelLnX());
+                shimmerBuffer.putDouble(testValueShimmer2.getAccelLnY());
+                shimmerBuffer.putDouble(testValueShimmer2.getAccelLnZ());
+                shimmerBuffer.putDouble(testValueShimmer2.getAccelWrX());
+                shimmerBuffer.putDouble(testValueShimmer2.getAccelWrY());
+                shimmerBuffer.putDouble(testValueShimmer2.getAccelWrZ());
+                shimmerBuffer.putDouble(testValueShimmer2.getGyroX());
+                shimmerBuffer.putDouble(testValueShimmer2.getGyroY());
+                shimmerBuffer.putDouble(testValueShimmer2.getGyroZ());
+                shimmerBuffer.putDouble(testValueShimmer2.getMagX());
+                shimmerBuffer.putDouble(testValueShimmer2.getMagY());
+                shimmerBuffer.putDouble(testValueShimmer2.getMagZ());
+                shimmerBuffer.putDouble(testValueShimmer2.getTemperature());
+                shimmerBuffer.putDouble(testValueShimmer2.getPressure());
+                shimmerBuffer.putDouble(testValueShimmer2.getTimestamp());
+                shimmerBuffer.putDouble(testValueShimmer2.getRealTimeClock());
+                shimmerBuffer.putDouble(testValueShimmer2.getTimestampSync());
+                shimmerBuffer.putDouble(testValueShimmer2.getRealTimeClockSync());
+
+                shimmerBytes = shimmerBuffer.array();
 
 
-                buffer.putInt(sensorMacAsBytes.length);
+                ByteBuffer locationBuffer = ByteBuffer.wrap(locationBytes).order(ByteOrder.LITTLE_ENDIAN);
 
-                buffer.put(sensorMacAsBytes);
+                locationBuffer.putInt(testValueShimmer.getDrrId());
 
+                //TODO hier schleife
 
+                locationBuffer.putDouble(testValueLocation.getLatitude());
+                locationBuffer.putDouble(testValueLocation.getLongitude());
+                locationBuffer.putLong(testValueLocation.getTime());
+                locationBuffer.putDouble(testValueLocation.getAccuracy());
+                locationBuffer.putDouble(testValueLocation.getAltitude());
+                locationBuffer.putLong(testValueLocation.getElapsedRealtimeNanos());
+                locationBuffer.putDouble(testValueLocation.getSpeed());
 
-                buffer.putDouble(testValue.getAccelLnX());
-                buffer.putDouble(testValue.getAccelLnY());
-                buffer.putDouble(testValue.getAccelLnZ());
-                buffer.putDouble(testValue.getAccelWrX());
-                buffer.putDouble(testValue.getAccelWrY());
-                buffer.putDouble(testValue.getAccelWrZ());
-                buffer.putDouble(testValue.getGyroX());
-                buffer.putDouble(testValue.getGyroY());
-                buffer.putDouble(testValue.getGyroZ());
-                buffer.putDouble(testValue.getMagX());
-                buffer.putDouble(testValue.getMagY());
-                buffer.putDouble(testValue.getMagZ());
-                buffer.putDouble(testValue.getTemperature());
-                buffer.putDouble(testValue.getPressure());
-                buffer.putDouble(testValue.getTimestamp());
-                buffer.putDouble(testValue.getRealTimeClock());
-                buffer.putDouble(testValue.getTimestampSync());
-                buffer.putDouble(testValue.getRealTimeClockSync());
-                buffer.putDouble(testValue.getDrrId());
-                ;
+                locationBuffer.putDouble(testValueLocation2.getLatitude());
+                locationBuffer.putDouble(testValueLocation2.getLongitude());
+                locationBuffer.putLong(testValueLocation2.getTime());
+                locationBuffer.putDouble(testValueLocation2.getAccuracy());
+                locationBuffer.putDouble(testValueLocation2.getAltitude());
+                locationBuffer.putLong(testValueLocation2.getElapsedRealtimeNanos());
+                locationBuffer.putDouble(testValueLocation2.getSpeed());
 
-                bytes = buffer.array();
-                //bytes = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).putDouble(3.1415).array();
-
-                //bytes = Util.reverse(bytes);
-
-
-                System.out.println("converted is ");
-
-                for (Byte b : bytes)
-                    System.out.println("\t" + String.format("%02x", b));
-
+                locationBytes = locationBuffer.array();
 
                 String path = getCacheDir() + "/ma/tmp/";
+                //path = Environment.getExternalStorageDirectory() + "/ma/tmp/";
                 File pathFile = new File(path);
+
 
 
                 System.out.println("cache dir path: " + path);
@@ -168,26 +228,96 @@ public class MainActivity extends AppCompatActivity {
                     pathFile.mkdirs();
 
 
-                final File theFile = new File(pathFile + "shimmer");
-                if (theFile.exists()) {
-                    theFile.delete();
-                    System.out.println("file got deleted");
+                final File theShimmerFile = new File(pathFile.getAbsolutePath() + "shimmer_" + System.currentTimeMillis());
+                if (theShimmerFile.exists()) {
+                    theShimmerFile.delete();
+                    System.out.println("shimmer file got deleted");
+                }
+
+                final File theLocationFile = new File(pathFile.getAbsolutePath() + "location_" + System.currentTimeMillis());
+                if (theLocationFile.exists()) {
+                    theLocationFile.delete();
+                    System.out.println("location file got deleted");
                 }
 
 
                 try {
-                    theFile.createNewFile();
-                    BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(theFile, false));
-                    bos.write(bytes);
-                    //bos.write
-                    bos.flush();
-                    bos.close();
+                    theShimmerFile.createNewFile();
+                    BufferedOutputStream bosShimmer = new BufferedOutputStream(new FileOutputStream(theShimmerFile, false));
+                    bosShimmer.write(shimmerBytes);
+                    //bosShimmer.write
+                    bosShimmer.flush();
+                    bosShimmer.close();
+
+
+                    /*
+                    Uri U = Uri.fromFile(theShimmerFile);
+                    Intent i = new Intent(Intent.ACTION_SEND);
+                    i.setType("image/png");
+                    i.putExtra(Intent.EXTRA_STREAM, U);
+                    startActivityForResult(Intent.createChooser(i, "Email:"),0);
+*/
+
+                    theLocationFile.createNewFile();
+                    BufferedOutputStream bosLocation = new BufferedOutputStream(new FileOutputStream(theLocationFile, false));
+                    bosLocation.write(locationBytes);
+                    bosLocation.flush();
+                    bosLocation.close();
+
+
+                    /*
+
+
+                    sending files via email, maybe useful for later
+
+
+
+
+
+
+
+
+
+
+                    Uri U2 = Uri.fromFile(theLocationFile);
+                    Intent i2 = new Intent(Intent.ACTION_SEND);
+                    i2.setType("image/png");
+                    i2.putExtra(Intent.EXTRA_STREAM, U2);
+                    startActivityForResult(Intent.createChooser(i2, "Email:"),1);
+*/
+
+/*
+                    final Intent emailIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+                    emailIntent.setType("text/plain");
+                    emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL,
+                            new String[]{"gitarreiro@gmail.com"});
+                    //emailIntent.putExtra(android.content.Intent.EXTRA_CC, new String[]{emailCC});
+                    emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Binärdateien");
+                    emailIntent.putExtra(Intent.EXTRA_TEXT, "In dieser E-ail stehen hoffentlich die Binärdateien");
+                    //has to be an ArrayList
+                    ArrayList<Uri> uris = new ArrayList<Uri>();
+                    //convert from paths to Android friendly Parcelable Uri's
+
+                    Uri u = Uri.fromFile(theShimmerFile);
+                    uris.add(u);
+
+                    Uri u2 = Uri.fromFile(theLocationFile);
+                    uris.add(u2);
+
+                    emailIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
+                    startActivity(Intent.createChooser(emailIntent, "Send mail..."));
+
+
+                    if (true)
+                        return;
+*/
 
                     try {
                         String uploadId =
                                 new MultipartUploadRequest(MainActivity.this, "http://37.221.199.137:8085/api/upload/Test")
                                         // starting from 3.1+, you can also use content:// URI string instead of absolute file
-                                        .addFileToUpload(theFile.getAbsolutePath(), "shimmer")
+                                        .addFileToUpload(theShimmerFile.getAbsolutePath(), "shimmer")
+                                        //.addFileToUpload(theLocationFile.getAbsolutePath(), "location")
                                         .setNotificationConfig(new UploadNotificationConfig())
                                         .setMaxRetries(2)
                                         .setDelegate(new UploadStatusDelegate() {
@@ -199,6 +329,7 @@ public class MainActivity extends AppCompatActivity {
                                             @Override
                                             public void onError(Context context, UploadInfo uploadInfo, Exception exception) {
                                                 // your code here
+                                                exception.printStackTrace();
                                             }
 
                                             @Override
@@ -206,7 +337,8 @@ public class MainActivity extends AppCompatActivity {
                                                 // your code here
                                                 // if you have mapped your server response to a POJO, you can easily get it:
                                                 // YourClass obj = new Gson().fromJson(serverResponse.getBodyAsString(), YourClass.class);
-                                                theFile.delete();
+                                                theShimmerFile.delete();
+                                                theLocationFile.delete();
                                                 System.out.println("finished upload - file should be deleted");
                                             }
 
@@ -262,13 +394,14 @@ public class MainActivity extends AppCompatActivity {
          */
 
 
-        String[] permissions = new String[6];
+        String[] permissions = new String[7];
         permissions[0] = Manifest.permission.BLUETOOTH;
         permissions[1] = Manifest.permission.BLUETOOTH_ADMIN;
         permissions[2] = Manifest.permission.ACCESS_COARSE_LOCATION;
         permissions[3] = Manifest.permission.INTERNET;
         permissions[4] = Manifest.permission.ACCESS_NETWORK_STATE;
         permissions[5] = Manifest.permission.ACCESS_FINE_LOCATION;
+        permissions[6] = Manifest.permission.WRITE_EXTERNAL_STORAGE;
         Util.checkPermissions(this, permissions);
 
         initView();
@@ -320,6 +453,10 @@ public class MainActivity extends AppCompatActivity {
 
         Button buttonSettings = (Button) findViewById(R.id.buttonRecordingSettings);
         buttonSettings.setOnClickListener(new OnButtonSettingsClickListener(this));
+
+        Button buttonBackupData = (Button) findViewById(R.id.buttonBackup);
+        buttonBackupData.setOnClickListener(new OnButtonBackupDataClickListener(this));
+
     }
 
 
