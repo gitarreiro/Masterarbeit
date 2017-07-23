@@ -237,6 +237,8 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
 
             shimmerBuffer.putInt(drr.getServerID());
 
+            System.out.println("writing " + values.size() + " Shimmer values for SMAC " + shimmerAddress);
+
             for (ShimmerValue value : values) {
                 shimmerBuffer.putDouble(value.getAccelLnX());
                 shimmerBuffer.putDouble(value.getAccelLnY());
@@ -372,9 +374,12 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
             for (String fileName : fileNames) {
                 i++;
                 request.addFileToUpload(fileName, "shimmer" + i);
+                System.out.println("added " + fileName + " to upload");
             }
 
             request.addFileToUpload(locationFile.getAbsolutePath(), "location");
+
+
 
             String uploadId = request.startUpload();
 

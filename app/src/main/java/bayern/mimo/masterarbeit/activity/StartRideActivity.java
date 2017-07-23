@@ -7,7 +7,6 @@ import android.widget.ToggleButton;
 
 import bayern.mimo.masterarbeit.R;
 import bayern.mimo.masterarbeit.exception.MAExceptionHandler;
-import bayern.mimo.masterarbeit.listener.OnButtonSendDataToServerClickListener;
 import bayern.mimo.masterarbeit.listener.OnButtonStartStopRecordingClickListener;
 
 /**

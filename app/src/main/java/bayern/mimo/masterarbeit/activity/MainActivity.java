@@ -454,7 +454,7 @@ public class MainActivity extends AppCompatActivity {
         Button buttonSettings = (Button) findViewById(R.id.buttonRecordingSettings);
         buttonSettings.setOnClickListener(new OnButtonSettingsClickListener(this));
 
-        Button buttonBackupData = (Button) findViewById(R.id.buttonBackup);
+        Button buttonBackupData = (Button) findViewById(R.id.buttonBackupRestore);
         buttonBackupData.setOnClickListener(new OnButtonBackupDataClickListener(this));
 
     }

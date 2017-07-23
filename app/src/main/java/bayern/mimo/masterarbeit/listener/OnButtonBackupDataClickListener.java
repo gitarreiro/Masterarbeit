@@ -4,8 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 
-import bayern.mimo.masterarbeit.activity.BackupDataActivity;
-import bayern.mimo.masterarbeit.activity.ShowAndUploadDataActivity;
+import bayern.mimo.masterarbeit.activity.BackupRestoreActivity;
 
 /**
  * Created by MiMo on 21.07.2017.
@@ -21,7 +20,7 @@ public class OnButtonBackupDataClickListener implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        Intent intent = new Intent(this.context, BackupDataActivity.class);
+        Intent intent = new Intent(this.context, BackupRestoreActivity.class);
         this.context.startActivity(intent);
     }
 }

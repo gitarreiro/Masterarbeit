@@ -104,6 +104,15 @@ public class AppSensors {
             shimmer.stopStreaming();
         }
 
+        /* TODO remove (only testing) */
+        for(Shimmer shimmer: shimmerSensors.keySet()){
+            ShimmerHandler handler = shimmerSensors.get(shimmer);
+
+            System.out.println("values recorded for " + shimmer.getBluetoothAddress() + ": " + handler.getValues().size());
+
+        }
+
+        /*until here TODO remove*/
         try {
             locationManager.removeUpdates(locationListener);
         } catch (SecurityException e) {
