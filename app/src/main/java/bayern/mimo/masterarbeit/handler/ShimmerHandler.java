@@ -3,6 +3,7 @@ package bayern.mimo.masterarbeit.handler;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.driver.Configuration;
@@ -43,23 +44,6 @@ public class ShimmerHandler extends Handler {
                     Double accelWrX = getValue(msg, Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_WR_X);
                     Double accelWrY = getValue(msg, Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_WR_Y);
                     Double accelWrZ = getValue(msg, Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_WR_Z);
-
-                    //System.out.println("accelLnX: " + accelLnX);
-                    //System.out.println("accelWrX: " + accelWrX);
-
-
-
-/*
-                    ObjectCluster objectCluster =  (ObjectCluster) msg.obj;
-                    Collection<FormatCluster> accelXFormats = objectCluster.mPropertyCluster.get(Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_WR);  // first retrieve all the possible formats for the current sensor device
-                    FormatCluster formatCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(accelXFormats,"CAL")); // retrieve the calibrated data
-                    if (formatCluster!=null){
-                        Log.d("CalibratedData",objectCluster.mMyName + " AccelX: " + formatCluster.mData + " "+ formatCluster.mUnits);
-                    }else{
-                        System.out.println("formatCluster is null");
-                    }
-*/
-
 
                     Double gyroX = getValue(msg, Configuration.Shimmer3.ObjectClusterSensorName.GYRO_X);
                     Double gyroY = getValue(msg, Configuration.Shimmer3.ObjectClusterSensorName.GYRO_Y);
@@ -102,12 +86,15 @@ public class ShimmerHandler extends Handler {
                     case Shimmer.MSG_STATE_FULLY_INITIALIZED:
                         caller.notifyShimmerConnected();
                         Log.d("ConnectionStatus", "Might have been connected");
+                        Toast.makeText(caller, "Connected!", Toast.LENGTH_LONG).show();
                         break;
                     case Shimmer.STATE_CONNECTING:
                         Log.d("ConnectionStatus", "Connecting");
+                        Toast.makeText(caller, "Connecting...", Toast.LENGTH_LONG).show();
                         break;
                     case Shimmer.STATE_NONE:
                         Log.d("ConnectionStatus", "No State");
+                        Toast.makeText(caller, "Unable to connect device! Try again.", Toast.LENGTH_LONG).show();
                         break;
                     default:
                         System.out.println("ConnectionStatus: " + msg.arg1);

@@ -84,6 +84,23 @@ public class AppSensors {
 
         startTime = new Date();
 
+
+
+        boolean allConnected = true;
+        for(Shimmer shimmer : shimmerSensors.keySet()){
+
+            shimmer.inquiry();
+
+            if(!shimmer.getInitialized()){
+                System.out.println("Shimmer device " + shimmer.getBluetoothAddress() + " is not connected!");
+            }else{
+                System.out.println("Shimmer device " +  shimmer.getBluetoothAddress() + " is connected!");
+            }
+                allConnected = allConnected && shimmer.getInitialized();
+        }
+
+        System.out.println("all connected? " + allConnected);
+
         for(Shimmer shimmer:shimmerSensors.keySet()){
             shimmer.startStreaming();
         }

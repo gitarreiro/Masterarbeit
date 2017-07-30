@@ -1,8 +1,8 @@
-TODO Library-Import beschreiben
-TODO Permissions überarbeiten
-TODO gesendetes JSON optimieren (DRR-ID muss nicht bei jedem dabei stehen, die Felder evtl. umbenennen auf kleinste Kürzel?)
+TODO Library-Import (Shimmer) beschreiben
+TODO Permission System überarbeiten
 TODO nicht benötigt Shimmer-Felder entfernen
 TODO ShowAndUploadDataActivity: für alle, die noch nicht hochgeladen wurden, Anfrage an den Server schicken, ob die evtl. schon hochgeladen sind
 TODO Upload Anzeige
-TODO evtl. Binärdaten schicken?
 TODO DatabaseHelper in Betracht ziehen
+TODO Auto-Backup als Option
+TODO alle DRRs anzeigen: nicht sofort alle Shimmer-Daten anzeigen

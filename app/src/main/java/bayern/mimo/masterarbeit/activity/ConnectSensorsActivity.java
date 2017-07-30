@@ -14,7 +14,9 @@ import android.widget.ListView;
 import com.shimmerresearch.android.Shimmer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import bayern.mimo.masterarbeit.R;
@@ -38,7 +40,7 @@ public class ConnectSensorsActivity extends AppCompatActivity {
 
     //TODO umschrieben auf Maps, eindeutige Zuordnung möglich
     private List<Shimmer> pendingShimmerSensors;
-    private List<ShimmerHandler> pendingShimmerHandlers;
+    private Map<String, ShimmerHandler> pendingShimmerHandlers;
     private List<Shimmer> shimmerSensors;
     private BluetoothAdapter adapter;
 
@@ -63,7 +65,7 @@ public class ConnectSensorsActivity extends AppCompatActivity {
 
     private void initVariables() {
         this.pendingShimmerSensors = new ArrayList<>();
-        this.pendingShimmerHandlers = new ArrayList<>();
+        this.pendingShimmerHandlers = new HashMap<>();
         this.shimmerSensors = new ArrayList<>();
     }
 
@@ -109,7 +111,7 @@ public class ConnectSensorsActivity extends AppCompatActivity {
                 if (shimmer != null) {
                     shimmer.connect(bluetoothAddress, "default");
                     pendingShimmerSensors.add(shimmer);
-                    pendingShimmerHandlers.add(handler);
+                    pendingShimmerHandlers.put(shimmer.getBluetoothAddress(), handler);
                     /*if(shimmer.getInitialized())
                         System.out.println("is initialized!");
                     else
@@ -183,7 +185,7 @@ public class ConnectSensorsActivity extends AppCompatActivity {
         for (int i = 0; i < pendingShimmerSensors.size(); i++) {
 
             Shimmer shimmer = pendingShimmerSensors.get(i);
-            ShimmerHandler handler = pendingShimmerHandlers.get(i);
+            ShimmerHandler handler = pendingShimmerHandlers.get(shimmer.getBluetoothAddress());
             if (shimmer.getInitialized()) {
                 shimmerSensors.add(shimmer);
                 sensorToRemove.add(shimmer);

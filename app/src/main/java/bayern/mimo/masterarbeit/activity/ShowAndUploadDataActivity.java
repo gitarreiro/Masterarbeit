@@ -28,6 +28,7 @@ import bayern.mimo.masterarbeit.SendToServerTask;
 import bayern.mimo.masterarbeit.adapter.RecordingAdapter;
 import bayern.mimo.masterarbeit.data.DataHelper;
 import bayern.mimo.masterarbeit.data.DataRecording;
+import bayern.mimo.masterarbeit.data.ShimmerValue;
 import bayern.mimo.masterarbeit.exception.MAExceptionHandler;
 import bayern.mimo.masterarbeit.util.Config;
 import bayern.mimo.masterarbeit.util.Util;
@@ -134,7 +135,14 @@ public class ShowAndUploadDataActivity extends AppCompatActivity {
                     Toast.makeText(ShowAndUploadDataActivity.this, "Already uploaded!", Toast.LENGTH_LONG).show();
                     return super.onContextItemSelected(item);
                 }
-                //TODO do upload only if data hasn't been uploaded yet
+                //TO>DO do upload only if data hasn't been uploaded yet
+
+                System.out.println("Sensoren: " + record.getShimmerValues().keySet().size());
+                for(String mac : record.getShimmerValues().keySet()){
+                    List<ShimmerValue> values = record.getShimmerValues().get(mac);
+                    System.out.println("Anzahl Werte für " + mac + ": " + values.size());
+                }
+
 
                 JSONObject jsonRequest = createRequest(record);
                 String url = Config.SERVER_API_URL + Config.DATA_RECORDING_REQUEST_PATH;
