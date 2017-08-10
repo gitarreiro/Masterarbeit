@@ -16,5 +16,9 @@ public class Config {
 
     public static final String DB_NAME = "maDbAndroid";
 
+    public static final String PREFS_FILE = "maPrefsFile";
+
+    public static final String PREFS_KEY_FRONT_SENSOR = "frontSensor";
+
     private Config(){}
 }

@@ -240,6 +240,10 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
             System.out.println("writing " + values.size() + " Shimmer values for SMAC " + shimmerAddress);
 
             for (ShimmerValue value : values) {
+
+                if(value == null)
+                    System.out.println("bla"); //TODO for testing. Werte werden direkt nach der Aufnahme nicht richtig gespeichert.j
+
                 shimmerBuffer.putDouble(value.getAccelLnX());
                 shimmerBuffer.putDouble(value.getAccelLnY());
                 shimmerBuffer.putDouble(value.getAccelLnZ());

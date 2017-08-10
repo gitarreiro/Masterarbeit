@@ -5,4 +5,7 @@ TODO ShowAndUploadDataActivity: für alle, die noch nicht hochgeladen wurden, An
 TODO Upload Anzeige
 TODO DatabaseHelper in Betracht ziehen
 TODO Auto-Backup als Option
-TODO alle DRRs anzeigen: nicht sofort alle Shimmer-Daten anzeigen
+TODO alle DRRs anzeigen: nicht sofort alle Shimmer-Daten laden
+TODO Bluetooth-Verbindung selbstständig mehrmals initiieren
+TODO Bluetooth inaktiv: nach aktivieren Liste refreshen, bei Ablehnen onBackPressed() ausführen
+TODO Bluetooth verbinden: checken, was passiert, wenn die Verbindung nicht klappt. vllt. muss die jeweilige MAC dann wieder aus den PENDINGs raus

@@ -61,6 +61,9 @@ public class AppSensors {
     }
 
     public static void addSensor(Shimmer sensor, ShimmerHandler handler) {
+
+        System.out.println("AppSensors.addSensor(" + sensor +", "+handler + ")");
+
         shimmerSensors.put(sensor, handler);
     }
 
@@ -76,6 +79,8 @@ public class AppSensors {
     public static boolean startRecording() {
         if (!isInitialized) return false; //TODO Fehlermeldung ausgeben
 
+
+
         for(ShimmerHandler handler : shimmerSensors.values()){
             handler.reset();
         }
@@ -85,7 +90,7 @@ public class AppSensors {
         startTime = new Date();
 
 
-
+/*
         boolean allConnected = true;
         for(Shimmer shimmer : shimmerSensors.keySet()){
 
@@ -98,8 +103,8 @@ public class AppSensors {
             }
                 allConnected = allConnected && shimmer.getInitialized();
         }
-
         System.out.println("all connected? " + allConnected);
+*/
 
         for(Shimmer shimmer:shimmerSensors.keySet()){
             shimmer.startStreaming();
@@ -144,6 +149,8 @@ public class AppSensors {
     }
 
     public static List<Shimmer> getShimmerSensors() {
+        if(shimmerSensors == null)
+            return new ArrayList<>();
         return new ArrayList<>(shimmerSensors.keySet());
     }
 

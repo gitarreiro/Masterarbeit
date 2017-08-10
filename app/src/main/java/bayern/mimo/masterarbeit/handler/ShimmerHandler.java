@@ -24,11 +24,14 @@ import bayern.mimo.masterarbeit.data.ShimmerValue;
 public class ShimmerHandler extends Handler {
 
     private ConnectSensorsActivity caller;
+    private String bluetoothAddress;
+
 
     private List<ShimmerValue> values;
 
-    public ShimmerHandler(ConnectSensorsActivity caller) {
+    public ShimmerHandler(ConnectSensorsActivity caller, String bluetoothAddress) {
         this.caller = caller;
+        this.bluetoothAddress = bluetoothAddress;
         this.values = new ArrayList<>();
     }
 
@@ -72,6 +75,8 @@ public class ShimmerHandler extends Handler {
                             timestampSync, realTimeClockSync, null, null);
 
                     this.values.add(value);
+
+
                     //System.out.println("added ShimmerValue");
                 }
                 break;
@@ -84,7 +89,7 @@ public class ShimmerHandler extends Handler {
             case Shimmer.MESSAGE_STATE_CHANGE:
                 switch (msg.arg1) {
                     case Shimmer.MSG_STATE_FULLY_INITIALIZED:
-                        caller.notifyShimmerConnected();
+                        caller.notifyShimmerConnected(this.bluetoothAddress);
                         Log.d("ConnectionStatus", "Might have been connected");
                         Toast.makeText(caller, "Connected!", Toast.LENGTH_LONG).show();
                         break;
@@ -93,6 +98,7 @@ public class ShimmerHandler extends Handler {
                         Toast.makeText(caller, "Connecting...", Toast.LENGTH_LONG).show();
                         break;
                     case Shimmer.STATE_NONE:
+                        caller.notifyShimmerConnectionFailed(this.bluetoothAddress);
                         Log.d("ConnectionStatus", "No State");
                         Toast.makeText(caller, "Unable to connect device! Try again.", Toast.LENGTH_LONG).show();
                         break;
