@@ -114,7 +114,7 @@ public class ShowAndUploadDataActivity extends AppCompatActivity {
 
 //TODO custom header?
 
-            String[] menuItems = {"Upload data"};
+            String[] menuItems = {"Upload data", "Classify"};
             for (int i = 0; i < menuItems.length; i++) {
                 menu.add(Menu.NONE, i, i, menuItems[i]);
             }
@@ -129,43 +129,43 @@ public class ShowAndUploadDataActivity extends AppCompatActivity {
 
         switch (item.getTitle().toString()) {
             case "Upload data":
-                DataRecording record = this.recordingAdapter.getItem(info.position);
-                if(record.isUploaded()){
+                DataRecording recordToUpload = this.recordingAdapter.getItem(info.position);
+                if(recordToUpload.isUploaded()){
                     //TODO richtigen Dialog anzeigen
                     Toast.makeText(ShowAndUploadDataActivity.this, "Already uploaded!", Toast.LENGTH_LONG).show();
                     return super.onContextItemSelected(item);
                 }
-                //TO>DO do upload only if data hasn't been uploaded yet
+                //TODO do upload only if data hasn't been uploaded yet
 
-                System.out.println("Sensoren: " + record.getShimmerValues().keySet().size());
-                for(String mac : record.getShimmerValues().keySet()){
-                    List<ShimmerValue> values = record.getShimmerValues().get(mac);
+                System.out.println("Sensoren: " + recordToUpload.getShimmerValues().keySet().size());
+                for(String mac : recordToUpload.getShimmerValues().keySet()){
+                    List<ShimmerValue> values = recordToUpload.getShimmerValues().get(mac);
                     System.out.println("Anzahl Werte für " + mac + ": " + values.size());
                 }
 
 
-                JSONObject jsonRequest = createRequest(record);
+                JSONObject jsonRequest = createRequest(recordToUpload);
                 String url = Config.SERVER_API_URL + Config.DATA_RECORDING_REQUEST_PATH;
 
 
-                this.task = new SendToServerTask(record, this);
+                this.task = new SendToServerTask(recordToUpload, this);
                 try{
                     task.execute(url, jsonRequest.toString());
                 }catch(Exception e){
-                    /*GMailSender sender = new GMailSender("username@gmail.com", "password");
-                    sender.sendMail("This is Subject",
-                            "This is Body",
-                            "user@gmail.com",
-                            "user@yahoo.com");
-                            */
                     //TODO http://stackoverflow.com/questions/2020088/sending-email-in-android-using-javamail-api-without-using-the-default-built-in-a/2033124#2033124
 
-                    Util.sendSMS(this, "+4915112488224", e.getStackTrace().toString());
-
+                    Util.sendSMS(this, "+4915112488224", e.getStackTrace().toString()); //TODO unbedingt entfernen
                 }
 
+                break;
+
+            case "Classify":
+
+                DataRecording recordToClassify = this.recordingAdapter.getItem(info.position);
+                classifyRecord(recordToClassify);
 
                 break;
+
             default:
                 //TODO DAS sollte nicht passieren
         }
@@ -197,4 +197,15 @@ public class ShowAndUploadDataActivity extends AppCompatActivity {
         }
         return request;
     }
+
+    private void classifyRecord(DataRecording record){
+        //TODO return most probable categories
+
+        //loadModel();
+
+    }
+
+
+
+
 }
