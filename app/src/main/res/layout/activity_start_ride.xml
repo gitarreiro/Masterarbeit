@@ -25,7 +25,7 @@
 
     <ToggleButton
         android:textOff="Start recording"
-        android:textOn="StopRecording"
+        android:textOn="Stop Recording"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/buttonStartRecording"

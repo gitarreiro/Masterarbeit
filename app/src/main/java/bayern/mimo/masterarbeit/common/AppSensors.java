@@ -144,9 +144,9 @@ public class AppSensors {
     }
 
 
-    public static Map<Shimmer, ShimmerHandler> getShimmerValues() {
+    /*public static Map<Shimmer, ShimmerHandler> getShimmerValues() {
         return shimmerSensors;
-    }
+    }*/
 
     public static List<Shimmer> getShimmerSensors() {
         if(shimmerSensors == null)

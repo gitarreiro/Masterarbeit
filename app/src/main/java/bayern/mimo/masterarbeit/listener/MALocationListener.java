@@ -11,7 +11,7 @@ import java.util.List;
 import bayern.mimo.masterarbeit.view.MADialog;
 
 /**
- * Created by MiMo on 17.04.2017.
+ * Created by MiMo
  */
 
 public class MALocationListener implements LocationListener {

@@ -186,7 +186,7 @@ public class SendToServerTask extends AsyncTask<String, Void, String> {
         if (result.contains("DRRID")) {
             //Upload completed
             String[] res = result.split(":");
-            System.out.println("Wir haben was tolles gefunden!");
+
             if (res.length == 2) {
                 System.out.println("Die Länge passt!");
                 //DRR ID auslesen

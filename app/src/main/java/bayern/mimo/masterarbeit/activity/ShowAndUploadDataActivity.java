@@ -26,6 +26,7 @@ import java.util.List;
 import bayern.mimo.masterarbeit.R;
 import bayern.mimo.masterarbeit.SendToServerTask;
 import bayern.mimo.masterarbeit.adapter.RecordingAdapter;
+import bayern.mimo.masterarbeit.common.ClassificationHelper;
 import bayern.mimo.masterarbeit.data.DataHelper;
 import bayern.mimo.masterarbeit.data.DataRecording;
 import bayern.mimo.masterarbeit.data.ShimmerValue;
@@ -147,7 +148,6 @@ public class ShowAndUploadDataActivity extends AppCompatActivity {
                 JSONObject jsonRequest = createRequest(recordToUpload);
                 String url = Config.SERVER_API_URL + Config.DATA_RECORDING_REQUEST_PATH;
 
-
                 this.task = new SendToServerTask(recordToUpload, this);
                 try{
                     task.execute(url, jsonRequest.toString());
@@ -195,13 +195,20 @@ public class ShowAndUploadDataActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        //TODO testing only
+        try {
+            System.out.println("request is \n" + request.toString(2));
+        }catch (JSONException e){
+            e.printStackTrace();
+        }
         return request;
     }
 
     private void classifyRecord(DataRecording record){
-        //TODO return most probable categories
 
-        //loadModel();
+        String classes = ClassificationHelper.classify(record);
+        Toast.makeText(this,classes,Toast.LENGTH_LONG).show();
 
     }
 
