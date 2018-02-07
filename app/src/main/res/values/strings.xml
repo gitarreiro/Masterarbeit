@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Masterarbeit</string>
+    <string name="app_name">Trackorizer</string>
     <string name="button_connect">Connect</string>
     <string name="button_disconnect">Disconnect</string>
     <string name="title_devices">Devices</string>
